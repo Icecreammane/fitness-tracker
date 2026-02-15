@@ -1621,16 +1621,18 @@
             if (!confirm('Delete this meal?')) return;
             
             try {
-                const meal = appState.meals[index];
                 const response = await fetch('/api/delete_meal', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ meal_id: meal.id })
+                    body: JSON.stringify({ meal_id: index })
                 });
                 
-                if (response.ok) {
-                    showToast('Meal deleted', 'success');
+                const result = await response.json();
+                if (result.success) {
+                    showToast('Meal deleted ✓', 'success');
                     await loadDashboardData();
+                } else {
+                    showToast('Failed to delete', 'error');
                 }
             } catch (error) {
                 console.error('Error deleting meal:', error);
