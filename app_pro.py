@@ -49,7 +49,7 @@ def health_check():
 
 @app.route('/')
 def dashboard():
-    return render_template('dashboard_v3.html')
+    return render_template('dashboard.html')
 
 @app.route('/settings')
 def settings():
@@ -74,6 +74,8 @@ def get_today():
     settings = data.get('settings', {})
     cal_goal = settings.get('daily_calorie_goal', 2200)
     protein_goal = settings.get('daily_protein_goal', 200)
+    carbs_goal = settings.get('daily_carbs_goal', 250)
+    fat_goal = settings.get('daily_fat_goal', 70)
     
     return jsonify({
         'date': today,
@@ -86,7 +88,9 @@ def get_today():
         },
         'goals': {
             'calories': cal_goal,
-            'protein': protein_goal
+            'protein': protein_goal,
+            'carbs': carbs_goal,
+            'fat': fat_goal
         },
         'progress': {
             'calories_pct': round((total_cal / cal_goal) * 100),
@@ -1261,6 +1265,154 @@ def generate_progress_card():
                 'avg_deficit': avg_deficit,
                 'period': '7 days'
             }
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 400
+
+# ============= MISSING ENDPOINTS FOR DASHBOARD V3 =============
+
+@app.route('/api/history')
+def get_history():
+    """Get meal/calorie history for specified number of days"""
+    try:
+        days = request.args.get('days', 14, type=int)
+        data = load_data()
+        
+        # Calculate date range
+        meals_by_date = defaultdict(list)
+        for meal in data['meals']:
+            meals_by_date[meal['date']].append(meal)
+        
+        today = datetime.now(ZoneInfo("America/Chicago"))
+        history = []
+        
+        for i in range(days - 1, -1, -1):
+            date = (today - timedelta(days=i)).strftime('%Y-%m-%d')
+            meals = meals_by_date[date]
+            
+            day_cal = sum(m['calories'] for m in meals)
+            day_protein = sum(m['protein'] for m in meals)
+            day_carbs = sum(m.get('carbs', 0) for m in meals)
+            day_fat = sum(m.get('fat', 0) for m in meals)
+            
+            history.append({
+                'date': date,
+                'calories': day_cal,
+                'protein': day_protein,
+                'carbs': day_carbs,
+                'fat': day_fat,
+                'meal_count': len(meals)
+            })
+        
+        return jsonify(history)
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 400
+
+@app.route('/api/delete_meal', methods=['POST'])
+def delete_meal():
+    """Delete a meal by index"""
+    try:
+        meal_id = request.json.get('meal_id')
+        data = load_data()
+        
+        # If meal_id is provided (for future ID-based deletion)
+        if meal_id is not None:
+            # For now, treat meal_id as index
+            if 0 <= meal_id < len(data['meals']):
+                deleted_meal = data['meals'].pop(meal_id)
+                save_data(data)
+                return jsonify({
+                    'success': True,
+                    'deleted': deleted_meal
+                })
+            else:
+                return jsonify({
+                    'success': False,
+                    'error': 'Invalid meal ID'
+                }), 400
+        else:
+            return jsonify({
+                'success': False,
+                'error': 'meal_id required'
+            }), 400
+            
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 400
+
+@app.route('/api/update_goals', methods=['POST'])
+def update_goals():
+    """Update calorie/protein/macro goals"""
+    try:
+        goals_update = request.json
+        data = load_data()
+        
+        if 'settings' not in data:
+            data['settings'] = {}
+        
+        # Update goals
+        if 'calories' in goals_update:
+            data['settings']['daily_calorie_goal'] = int(goals_update['calories'])
+        if 'protein' in goals_update:
+            data['settings']['daily_protein_goal'] = int(goals_update['protein'])
+        if 'carbs' in goals_update:
+            data['settings']['daily_carbs_goal'] = int(goals_update['carbs'])
+        if 'fat' in goals_update:
+            data['settings']['daily_fat_goal'] = int(goals_update['fat'])
+        
+        save_data(data)
+        
+        return jsonify({
+            'success': True,
+            'updated_goals': data['settings']
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 400
+
+@app.route('/api/clear_data', methods=['POST'])
+def clear_all_data():
+    """Clear all user data (⚠️ DESTRUCTIVE)"""
+    try:
+        # Create backup before clearing
+        data = load_data()
+        backup_file = f'fitness_data_backup_{datetime.now(ZoneInfo("America/Chicago")).strftime("%Y%m%d_%H%M%S")}.json'
+        
+        with open(backup_file, 'w') as f:
+            json.dump(data, f, indent=2)
+        
+        # Reset to empty data structure
+        empty_data = {
+            'meals': [],
+            'weight_history': [],
+            'progress_photos': [],
+            'settings': {
+                'daily_calorie_goal': 2200,
+                'daily_protein_goal': 200,
+                'daily_carbs_goal': 250,
+                'daily_fat_goal': 70
+            }
+        }
+        
+        save_data(empty_data)
+        
+        return jsonify({
+            'success': True,
+            'backup_file': backup_file,
+            'message': 'All data cleared. Backup saved.'
         })
         
     except Exception as e:
