@@ -1424,3 +1424,19 @@ def clear_all_data():
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=3000, debug=True)
 
+
+@app.route('/api/debug/versions')
+def debug_versions():
+    """Debug endpoint to check package versions"""
+    import sys
+    try:
+        import openai
+        openai_version = openai.__version__
+    except:
+        openai_version = "not installed"
+    
+    return jsonify({
+        'python': sys.version,
+        'openai': openai_version,
+        'openai_key_set': bool(os.getenv('OPENAI_API_KEY'))
+    })
