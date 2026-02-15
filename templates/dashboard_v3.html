@@ -1184,6 +1184,36 @@
     </div>
     
     <!-- Goal Calculator Modal -->
+    <!-- Simple Goal Setup Modal (First-time) -->
+    <div class="modal-overlay" id="goalSetupModal">
+        <div class="modal">
+            <h3 class="modal-title">🎯 Set Your Daily Goals</h3>
+            <p style="margin-bottom: 20px; color: #888; font-size: 14px;">Enter your daily targets to get started</p>
+            <div class="form-group">
+                <label class="form-label">Daily Calories</label>
+                <input type="number" class="form-input" id="setupCalories" placeholder="2200" value="2200">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Daily Protein (g)</label>
+                <input type="number" class="form-input" id="setupProtein" placeholder="200" value="200">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Daily Carbs (g)</label>
+                <input type="number" class="form-input" id="setupCarbs" placeholder="250" value="250">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Daily Fat (g)</label>
+                <input type="number" class="form-input" id="setupFat" placeholder="70" value="70">
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-primary" style="width: 100%;" onclick="saveInitialGoals()">Start Tracking</button>
+            </div>
+            <p style="margin-top: 15px; text-align: center; color: #666; font-size: 13px;">
+                Not sure? <a href="#" onclick="openGoalCalculator(); return false;" style="color: #00d9ff;">Use the calculator</a>
+            </p>
+        </div>
+    </div>
+
     <div class="modal-overlay" id="goalCalculatorModal">
         <div class="modal">
             <h3 class="modal-title">🎯 Goal Calculator</h3>
@@ -1454,11 +1484,17 @@
                 appState.goals = todayData.goals;
                 appState.today = todayData.totals;
                 appState.meals = todayData.meals || [];
+                appState.onboarded = todayData.onboarded;
                 
                 // Update UI
                 updateMacroCards();
                 updateMealHistory();
                 updateSettingsDisplay();
+
+                // If not onboarded, prompt goals setup
+                if (appState.onboarded === false) {
+                    openGoalSetup();
+                }
                 
                 // Load 14-day history for chart
                 const historyRes = await fetch('/api/history?days=14');
@@ -1923,8 +1959,55 @@
             }
         }
         
+        // ========== GOAL SETUP (First-time) ==========
+        function openGoalSetup() {
+            document.getElementById('goalSetupModal').classList.add('active');
+        }
+
+        function closeGoalSetup() {
+            document.getElementById('goalSetupModal').classList.remove('active');
+        }
+
+        async function saveInitialGoals() {
+            const calories = parseInt(document.getElementById('setupCalories').value);
+            const protein = parseInt(document.getElementById('setupProtein').value);
+            const carbs = parseInt(document.getElementById('setupCarbs').value);
+            const fat = parseInt(document.getElementById('setupFat').value);
+
+            if (!calories || !protein || !carbs || !fat) {
+                showToast('Please fill in all goals', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/save_goals', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        daily_calorie_goal: calories,
+                        daily_protein_goal: protein,
+                        daily_carbs_goal: carbs,
+                        daily_fat_goal: fat
+                    })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    closeGoalSetup();
+                    showToast('Goals saved! 🎯', 'success');
+                    await loadDashboardData();
+                } else {
+                    showToast('Failed to save goals', 'error');
+                }
+            } catch (error) {
+                console.error('Error saving goals:', error);
+                showToast('Failed to save goals', 'error');
+            }
+        }
+
         // ========== GOAL CALCULATOR ==========
         function openGoalCalculator() {
+            closeGoalSetup(); // Close setup modal if open
             document.getElementById('goalCalculatorModal').classList.add('active');
             document.getElementById('goalResults').style.display = 'none';
         }

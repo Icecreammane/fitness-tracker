@@ -5,9 +5,10 @@ Frictionless meal tracking with AI-powered insights
 Built for speed, simplicity, and results
 """
 
-from flask import Flask, render_template, jsonify, request, redirect, url_for, make_response
+from flask import Flask, render_template, jsonify, request, redirect, url_for, make_response, g
 import json
 import os
+import uuid
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 from collections import defaultdict
@@ -29,15 +30,88 @@ if not app.config['DEBUG']:
     logging.basicConfig(level=logging.INFO)
     app.logger.setLevel(logging.INFO)
 
-DATA_FILE = 'fitness_data.json'
+LEGACY_DATA_FILE = 'fitness_data.json'
+USER_DATA_DIR = os.getenv('LEAN_USER_DATA_DIR', 'data/users')
+
+def _default_user_data():
+    return {
+        'meals': [],
+        'settings': {
+            'daily_calorie_goal': 2200,
+            'daily_protein_goal': 200,
+            'daily_carbs_goal': 250,
+            'daily_fat_goal': 70,
+            'onboarded': False
+        },
+        'workouts': [],
+        'progress_photos': [],
+        'weights': []
+    }
+
+def _ensure_user_dir():
+    os.makedirs(USER_DATA_DIR, exist_ok=True)
+
+def _user_data_path(uid: str) -> str:
+    _ensure_user_dir()
+    safe = ''.join(ch for ch in uid if ch.isalnum() or ch in ('-','_'))
+    return os.path.join(USER_DATA_DIR, f'{safe}.json')
+
+def _get_or_create_uid():
+    uid = request.cookies.get('lean_uid')
+    if not uid:
+        uid = str(uuid.uuid4())
+        g._set_uid_cookie = True
+    g.lean_uid = uid
+    return uid
+
+def _maybe_migrate_legacy(uid: str, path: str):
+    # If legacy single-user file exists and this user file doesn't, migrate once.
+    if os.path.exists(path):
+        return
+    if os.path.exists(LEGACY_DATA_FILE):
+        try:
+            with open(LEGACY_DATA_FILE) as f:
+                legacy = json.load(f)
+            # basic sanity
+            if isinstance(legacy, dict) and ('meals' in legacy or 'settings' in legacy):
+                _ensure_user_dir()
+                with open(path, 'w') as f:
+                    json.dump(legacy, f, indent=2)
+                return
+        except Exception:
+            pass
+
+    # Otherwise create fresh
+    data = _default_user_data()
+    _ensure_user_dir()
+    with open(path, 'w') as f:
+        json.dump(data, f, indent=2)
 
 def load_data():
-    with open(DATA_FILE) as f:
+    uid = getattr(g, 'lean_uid', None) or _get_or_create_uid()
+    path = _user_data_path(uid)
+    _maybe_migrate_legacy(uid, path)
+    with open(path) as f:
         return json.load(f)
 
 def save_data(data):
-    with open(DATA_FILE, 'w') as f:
+    uid = getattr(g, 'lean_uid', None) or _get_or_create_uid()
+    path = _user_data_path(uid)
+    _ensure_user_dir()
+    with open(path, 'w') as f:
         json.dump(data, f, indent=2)
+
+@app.before_request
+def _attach_uid():
+    g._set_uid_cookie = False
+    _get_or_create_uid()
+
+@app.after_request
+def _set_uid_cookie(response):
+    if getattr(g, '_set_uid_cookie', False):
+        # 1 year cookie; SameSite Lax is fine for this MVP
+        response.set_cookie('lean_uid', g.lean_uid, max_age=60*60*24*365, samesite='Lax')
+    return response
 
 @app.route('/health')
 def health_check():
@@ -92,6 +166,7 @@ def get_today():
             'carbs': carbs_goal,
             'fat': fat_goal
         },
+        'onboarded': bool(settings.get('onboarded', False)),
         'progress': {
             'calories_pct': round((total_cal / cal_goal) * 100),
             'protein_pct': round((total_protein / protein_goal) * 100)
@@ -685,26 +760,24 @@ def calculate_goals():
 
 @app.route('/api/save_goals', methods=['POST'])
 def save_goals():
-    """Save user goals and apply recommended calories"""
+    """Save user goals (per-user)"""
     try:
-        goals = request.json
-        
-        # Save to user_goals.json
-        with open('user_goals.json', 'w') as f:
-            json.dump(goals, f, indent=2)
-        
-        # Update settings in fitness_data.json
+        goals = request.json or {}
+
         data = load_data()
         if 'settings' not in data:
             data['settings'] = {}
-        
-        data['settings']['daily_calorie_goal'] = goals.get('daily_calorie_goal', 2200)
-        data['settings']['daily_protein_goal'] = goals.get('daily_protein_goal', 200)
-        
+
+        data['settings']['daily_calorie_goal'] = int(goals.get('daily_calorie_goal', 2200))
+        data['settings']['daily_protein_goal'] = int(goals.get('daily_protein_goal', 200))
+        data['settings']['daily_carbs_goal'] = int(goals.get('daily_carbs_goal', 250))
+        data['settings']['daily_fat_goal'] = int(goals.get('daily_fat_goal', 70))
+        data['settings']['onboarded'] = True
+
         save_data(data)
-        
-        return jsonify({'success': True})
-        
+
+        return jsonify({'success': True, 'settings': data['settings']})
+
     except Exception as e:
         return jsonify({
             'success': False,
@@ -1351,6 +1424,9 @@ def update_goals():
             data['settings']['daily_carbs_goal'] = int(goals_update['carbs'])
         if 'fat' in goals_update:
             data['settings']['daily_fat_goal'] = int(goals_update['fat'])
+        
+        # Mark as onboarded if goals were set
+        data['settings']['onboarded'] = True
         
         save_data(data)
         
