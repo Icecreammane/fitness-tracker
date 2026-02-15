@@ -1481,10 +1481,14 @@
                 const todayRes = await fetch('/api/today');
                 const todayData = await todayRes.json();
                 
+                // Load all recent meals (last 30 days)
+                const allMealsRes = await fetch('/api/meals?days=30');
+                const allMealsData = await allMealsRes.json();
+                
                 // Update state
                 appState.goals = todayData.goals;
                 appState.today = todayData.totals;
-                appState.meals = todayData.meals || [];
+                appState.meals = allMealsData.meals || todayData.meals || [];
                 appState.onboarded = todayData.onboarded;
                 
                 // Update UI

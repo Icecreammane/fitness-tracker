@@ -207,6 +207,23 @@ def get_today():
         }
     })
 
+@app.route('/api/meals')
+def get_meals():
+    """Get recent meals (for displaying in Recent Meals section)"""
+    days = int(request.args.get('days', 30))
+    data = load_data()
+    now = datetime.now(ZoneInfo("America/Chicago"))
+    cutoff_date = (now - timedelta(days=days)).strftime('%Y-%m-%d')
+    
+    # Get all meals from the last N days, sorted by date+time descending
+    recent_meals = [m for m in data['meals'] if m['date'] >= cutoff_date]
+    recent_meals.sort(key=lambda x: (x['date'], x.get('time', '00:00')), reverse=True)
+    
+    return jsonify({
+        'meals': recent_meals,
+        'count': len(recent_meals)
+    })
+
 @app.route('/api/goal_projection')
 def get_goal_projection():
     """Calculate goal projection based on actual progress"""
