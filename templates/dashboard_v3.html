@@ -1658,9 +1658,14 @@
                 return;
             }
             
-            stopAudioRecording();
-            processVoiceLog();
+            // FIXED: Wait for MediaRecorder to finish THEN process
+            if (appState.mediaRecorder) {
+                appState.mediaRecorder.addEventListener('stop', () => {
+                    processVoiceLog();
+                }, { once: true });
+            }
             
+            stopAudioRecording();
             appState.isRecording = false;
         }
         
