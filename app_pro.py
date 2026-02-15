@@ -148,7 +148,11 @@ def version_check():
 
 @app.route('/')
 def dashboard():
-    return render_template('dashboard_v3.html')
+    response = make_response(render_template('dashboard_v3.html'))
+    response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    return response
 
 @app.route('/settings')
 def settings():
