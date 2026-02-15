@@ -23,6 +23,7 @@ except ImportError:
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-secret-key-change-in-production')
 app.config['DEBUG'] = os.getenv('FLASK_ENV') != 'production'
+app.config['TEMPLATES_AUTO_RELOAD'] = True  # Force template reload in production
 
 # Production logging
 import logging
@@ -119,6 +120,30 @@ def health_check():
     return jsonify({
         'status': 'healthy',
         'timestamp': datetime.now(ZoneInfo("America/Chicago")).isoformat()
+    })
+
+@app.route('/version')
+def version_check():
+    """Check what version is deployed"""
+    import subprocess
+    try:
+        git_hash = subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD'], cwd=os.path.dirname(__file__)).decode().strip()
+    except:
+        git_hash = 'unknown'
+    
+    template_path = os.path.join(os.path.dirname(__file__), 'templates', 'dashboard_v3.html')
+    try:
+        with open(template_path, 'r') as f:
+            first_lines = ''.join(f.readlines()[:5])
+            has_version_tag = 'v2.0.1' in first_lines
+    except:
+        has_version_tag = False
+        first_lines = 'error reading template'
+    
+    return jsonify({
+        'git_commit': git_hash,
+        'template_has_v2_0_1': has_version_tag,
+        'template_preview': first_lines[:200]
     })
 
 @app.route('/')
