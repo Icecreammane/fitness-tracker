@@ -557,52 +557,15 @@ def voice_log():
         temp_path = f'/tmp/voice_{datetime.now(ZoneInfo("America/Chicago")).timestamp()}.webm'
         audio_file.save(temp_path)
         
+        # Use direct API calls instead of SDK to avoid proxy issues
+        from voice_fix import transcribe_audio_direct, parse_meal_direct
+        api_key = os.getenv('OPENAI_API_KEY')
+        
         # Transcribe with Whisper
-        from openai import OpenAI
-        # Unset proxy env vars that Railway might set
-        for proxy_var in ['HTTP_PROXY', 'HTTPS_PROXY', 'http_proxy', 'https_proxy']:
-            os.environ.pop(proxy_var, None)
-        client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
-        
-        with open(temp_path, 'rb') as f:
-            transcript = client.audio.transcriptions.create(
-                model="whisper-1",
-                file=f
-            )
-        
-        text = transcript.text
+        text = transcribe_audio_direct(temp_path, api_key)
         
         # Parse food from text using GPT
-        response = client.chat.completions.create(
-            model="gpt-4o",
-            messages=[{
-                "role": "user",
-                "content": f"""Parse this meal description and provide macro estimates.
-
-User said: "{text}"
-
-Return ONLY valid JSON (no markdown, no explanation):
-{{
-  "food": "parsed food name",
-  "portion_size": "estimated portion",
-  "calories": number,
-  "protein": number,
-  "carbs": number,
-  "fat": number,
-  "confidence": "high/medium/low"
-}}"""
-            }]
-        )
-        
-        # Parse response
-        result_text = response.choices[0].message.content.strip()
-        if result_text.startswith('```'):
-            lines = result_text.split('\n')
-            result_text = '\n'.join([l for l in lines if not l.startswith('```')])
-            result_text = result_text.strip()
-            if result_text.startswith('json'):
-                result_text = result_text[4:].strip()
-        
+        result_text = parse_meal_direct(text, api_key)
         meal_data = json.loads(result_text)
         
         # Clean up temp file
