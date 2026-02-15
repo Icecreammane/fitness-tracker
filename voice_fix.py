@@ -3,12 +3,21 @@ import requests
 
 def transcribe_audio_direct(audio_path, api_key):
     """Call Whisper API directly without SDK"""
+    import os
+    
+    # Check file size
+    file_size = os.path.getsize(audio_path)
+    print(f"Audio file size: {file_size} bytes")
+    
+    if file_size == 0:
+        raise Exception("Audio file is empty")
+    
     url = "https://api.openai.com/v1/audio/transcriptions"
     headers = {"Authorization": f"Bearer {api_key}"}
     
-    # Ensure file has correct extension for Whisper
+    # Try multiple formats - webm might not work, try as mp3
     with open(audio_path, 'rb') as f:
-        files = {'file': ('audio.webm', f, 'audio/webm')}
+        files = {'file': ('audio.mp3', f, 'audio/mpeg')}
         data = {'model': 'whisper-1'}
         response = requests.post(url, headers=headers, files=files, data=data)
     
