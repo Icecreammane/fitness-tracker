@@ -6,8 +6,9 @@ def transcribe_audio_direct(audio_path, api_key):
     url = "https://api.openai.com/v1/audio/transcriptions"
     headers = {"Authorization": f"Bearer {api_key}"}
     
+    # Ensure file has correct extension for Whisper
     with open(audio_path, 'rb') as f:
-        files = {'file': f}
+        files = {'file': ('audio.webm', f, 'audio/webm')}
         data = {'model': 'whisper-1'}
         response = requests.post(url, headers=headers, files=files, data=data)
     
