@@ -129,6 +129,15 @@ def dashboard():
 def settings():
     return render_template('settings.html')
 
+@app.route('/import')
+def import_page():
+    """Serve the import utility page"""
+    try:
+        with open('import.html') as f:
+            return f.read()
+    except:
+        return "Import page not found", 404
+
 @app.route('/api/today')
 def get_today():
     """Get today's complete data"""
