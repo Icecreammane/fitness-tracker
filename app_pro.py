@@ -568,6 +568,22 @@ def voice_log():
         result_text = parse_meal_direct(text, api_key)
         meal_data = json.loads(result_text)
         
+        # SAVE THE MEAL TO DATABASE
+        now = datetime.now(ZoneInfo("America/Chicago"))
+        new_meal = {
+            'date': now.strftime('%Y-%m-%d'),
+            'time': now.strftime('%H:%M'),
+            'description': meal_data.get('food', text),
+            'calories': int(meal_data.get('calories', 0)),
+            'protein': int(meal_data.get('protein', 0)),
+            'carbs': int(meal_data.get('carbs', 0)),
+            'fat': int(meal_data.get('fat', 0))
+        }
+        
+        data = load_data()
+        data['meals'].append(new_meal)
+        save_data(data)
+        
         # Clean up temp file
         os.remove(temp_path)
         
