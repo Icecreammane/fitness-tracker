@@ -2,370 +2,722 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lean - Smart Calorie Tracking</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Lean - Your Fitness Journey</title>
     <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <style>
+        /* ========== RESET & CORE ========== */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+        }
+        
+        :root {
+            --bg-primary: #000000;
+            --bg-secondary: #0a0a0a;
+            --bg-card: #111111;
+            --bg-glass: rgba(17, 17, 17, 0.8);
+            --accent-cyan: #00d4ff;
+            --accent-lime: #00ff88;
+            --accent-gradient: linear-gradient(135deg, #00d4ff, #00ff88);
+            --text-primary: #ffffff;
+            --text-secondary: #888888;
+            --text-muted: #555555;
+            --border-subtle: #1a1a1a;
+            --shadow-glow: 0 0 20px rgba(0, 212, 255, 0.3);
+        }
+        
+        html {
+            scroll-behavior: smooth;
+            overscroll-behavior: none;
         }
         
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: #0a0a0a;
-            color: #fff;
-            padding: 15px;
-            max-width: 800px;
-            margin: 0 auto;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
             min-height: 100vh;
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
         }
         
-        /* ONBOARDING MODAL */
-        .onboarding-overlay {
+        /* ========== CONTAINER ========== */
+        .app-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 0 20px 100px;
+            position: relative;
+        }
+        
+        /* ========== HEADER WITH STREAK ========== */
+        .header {
+            padding: 20px 0 30px;
+            position: relative;
+        }
+        
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 25px;
+        }
+        
+        .header-title {
+            flex: 1;
+        }
+        
+        .date-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .app-logo {
+            font-size: 36px;
+            font-weight: 800;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -1px;
+        }
+        
+        .settings-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-secondary);
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        
+        .settings-btn:active {
+            transform: scale(0.95);
+            background: var(--bg-secondary);
+        }
+        
+        /* ========== STREAK COUNTER (FIRE EMOJI GROWING) ========== */
+        .streak-display {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 20px;
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-subtle);
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .streak-display::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--accent-gradient);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .streak-display.active::before {
+            opacity: 1;
+        }
+        
+        .streak-fire {
+            font-size: 48px;
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            will-change: transform;
+        }
+        
+        .streak-fire.bounce {
+            animation: fireBounce 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        @keyframes fireBounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.3) rotate(10deg); }
+        }
+        
+        .streak-info {
+            flex: 1;
+        }
+        
+        .streak-count {
+            font-size: 32px;
+            font-weight: 800;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 4px;
+        }
+        
+        .streak-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+        
+        .streak-dots {
+            display: flex;
+            gap: 6px;
+            margin-top: 12px;
+        }
+        
+        .streak-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        .streak-dot.active {
+            background: var(--accent-cyan);
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+            transform: scale(1.2);
+        }
+        
+        /* ========== PROGRESS PHOTOS (ALWAYS VISIBLE) ========== */
+        .progress-photos {
+            margin: 30px 0;
+        }
+        
+        .photos-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .photo-card {
+            aspect-ratio: 3/4;
+            border-radius: 20px;
+            background: var(--bg-card);
+            border: 2px solid var(--border-subtle);
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .photo-card:active {
+            transform: scale(0.98);
+        }
+        
+        .photo-card.empty {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            border-style: dashed;
+        }
+        
+        .photo-card.empty .icon {
+            font-size: 40px;
+            opacity: 0.3;
+        }
+        
+        .photo-card.empty .label {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+        
+        .photo-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .photo-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 15px;
+            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+        }
+        
+        .photo-date {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-bottom: 3px;
+        }
+        
+        .photo-weight {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        
+        .share-card-btn {
+            width: 100%;
+            padding: 16px;
+            background: var(--accent-gradient);
+            border: none;
+            border-radius: 16px;
+            color: #000;
+            font-size: 15px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            -webkit-user-select: none;
+        }
+        
+        .share-card-btn:active {
+            transform: scale(0.98);
+            opacity: 0.9;
+        }
+        
+        /* ========== CALORIE BAR (VISUAL, NO NUMBERS) ========== */
+        .calorie-section {
+            margin: 30px 0;
+        }
+        
+        .section-title {
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+        }
+        
+        .calorie-bar-container {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 25px;
+            border: 1px solid var(--border-subtle);
+        }
+        
+        .calorie-bar {
+            width: 100%;
+            height: 12px;
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+            margin-bottom: 20px;
+        }
+        
+        .calorie-fill {
+            height: 100%;
+            background: var(--accent-gradient);
+            border-radius: 20px;
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.5);
+        }
+        
+        .calorie-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        .calorie-status {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .status-emoji {
+            font-size: 28px;
+        }
+        
+        .status-text {
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+        
+        /* ========== RECENT MEALS (SWIPEABLE CARDS) ========== */
+        .meals-section {
+            margin: 30px 0;
+        }
+        
+        .meals-scroll {
+            display: flex;
+            gap: 15px;
+            overflow-x: auto;
+            overflow-y: hidden;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 10px;
+            margin: 0 -20px;
+            padding: 0 20px 10px;
+        }
+        
+        .meals-scroll::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .meal-card {
+            min-width: 280px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 20px;
+            padding: 20px;
+            scroll-snap-align: start;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+        
+        .meal-card:active {
+            transform: scale(0.98);
+        }
+        
+        .meal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .meal-time {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+        
+        .meal-icon {
+            font-size: 24px;
+        }
+        
+        .meal-name {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+        
+        .meal-macros {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .macro-item {
+            flex: 1;
+        }
+        
+        .macro-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--accent-cyan);
+        }
+        
+        .macro-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-top: 2px;
+        }
+        
+        /* ========== VOICE BUTTON (ALWAYS VISIBLE) ========== */
+        .voice-fab {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: var(--accent-gradient);
+            border: none;
+            box-shadow: 0 8px 24px rgba(0, 212, 255, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            cursor: pointer;
+            z-index: 1000;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            -webkit-user-select: none;
+        }
+        
+        .voice-fab:active {
+            transform: scale(0.9);
+        }
+        
+        .voice-fab.recording {
+            animation: pulse 1.5s infinite;
+            box-shadow: 0 0 0 0 rgba(0, 212, 255, 0.7);
+        }
+        
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(0, 212, 255, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 20px rgba(0, 212, 255, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(0, 212, 255, 0);
+            }
+        }
+        
+        /* ========== CAMERA FAB ========== */
+        .camera-fab {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--bg-card);
+            border: 2px solid var(--border-subtle);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            cursor: pointer;
+            z-index: 1000;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        .camera-fab:active {
+            transform: scale(0.9);
+        }
+        
+        /* ========== CONFETTI ========== */
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: var(--accent-cyan);
+            position: absolute;
+            animation: confetti-fall 3s linear forwards;
+            z-index: 9999;
+            pointer-events: none;
+        }
+        
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(0) rotateZ(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotateZ(720deg);
+                opacity: 0;
+            }
+        }
+        
+        /* ========== QUICK ADD PANEL ========== */
+        .quick-add-panel {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--bg-glass);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border-top: 1px solid var(--border-subtle);
+            padding: 20px 20px calc(20px + env(safe-area-inset-bottom));
+            transform: translateY(100%);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 999;
+        }
+        
+        .quick-add-panel.active {
+            transform: translateY(0);
+        }
+        
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .panel-title {
+            font-size: 18px;
+            font-weight: 700;
+        }
+        
+        .panel-close {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: var(--bg-card);
+            border: none;
+            color: var(--text-secondary);
+            font-size: 20px;
+            cursor: pointer;
+        }
+        
+        .quick-add-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 10px;
+        }
+        
+        .quick-add-btn {
+            padding: 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .quick-add-btn:active {
+            transform: scale(0.95);
+            background: var(--bg-secondary);
+        }
+        
+        .quick-add-btn .emoji {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+        
+        .quick-add-btn .name {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .quick-add-btn .cals {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+        
+        /* ========== VOICE RECORDING MODAL ========== */
+        .voice-modal {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
             background: rgba(0, 0, 0, 0.95);
+            display: none;
+            align-items: center;
+            justify-content: center;
             z-index: 9999;
-            display: none;
-            align-items: center;
-            justify-content: center;
+            backdrop-filter: blur(10px);
         }
         
-        .onboarding-overlay.active {
+        .voice-modal.active {
             display: flex;
         }
         
-        .onboarding-modal {
-            background: #1a1a1a;
-            border-radius: 24px;
-            max-width: 500px;
-            width: 90%;
-            padding: 40px 30px;
+        .voice-modal-content {
             text-align: center;
-            position: relative;
+            padding: 40px;
         }
         
-        .onboarding-step {
-            display: none;
-        }
-        
-        .onboarding-step.active {
-            display: block;
-            animation: fadeIn 0.3s ease;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .onboarding-icon {
-            font-size: 64px;
-            margin-bottom: 20px;
-        }
-        
-        .onboarding-title {
-            font-size: 28px;
-            font-weight: 700;
-            margin-bottom: 12px;
-            background: linear-gradient(135deg, #00d4ff, #00ff88);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        
-        .onboarding-text {
-            font-size: 16px;
-            color: #888;
-            margin-bottom: 30px;
-            line-height: 1.5;
-        }
-        
-        .demo-buttons {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            margin: 30px 0;
-        }
-        
-        .demo-button {
-            width: 80px;
-            height: 80px;
-            border-radius: 20px;
-            border: 2px solid #333;
-            background: #0f0f0f;
-            font-size: 32px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .demo-button:hover {
-            border-color: #00d4ff;
-            transform: scale(1.05);
-        }
-        
-        .onboarding-progress {
-            display: flex;
-            gap: 8px;
-            justify-content: center;
-            margin-top: 30px;
-        }
-        
-        .progress-dot {
-            width: 8px;
-            height: 8px;
+        .voice-wave {
+            width: 150px;
+            height: 150px;
             border-radius: 50%;
-            background: #333;
-        }
-        
-        .progress-dot.active {
-            background: #00d4ff;
-            width: 24px;
-            border-radius: 4px;
-        }
-        
-        .onboarding-btn {
-            background: linear-gradient(135deg, #00d4ff, #00ff88);
-            border: none;
-            border-radius: 12px;
-            padding: 16px 40px;
-            color: #0a0a0a;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            min-height: 50px;
-            min-width: 160px;
-        }
-        
-        .onboarding-skip {
-            color: #666;
-            font-size: 14px;
-            margin-top: 20px;
-            cursor: pointer;
-        }
-        
-        .onboarding-skip:hover {
-            color: #fff;
-        }
-        
-        /* HEADER */
-        .header {
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .header-left {
-            flex: 1;
-        }
-        
-        .date {
-            font-size: 13px;
-            color: #888;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        h1 {
-            font-size: 32px;
-            font-weight: 700;
-            margin-top: 5px;
-            background: linear-gradient(135deg, #00d4ff, #00ff88);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        
-        .header-actions {
-            display: flex;
-            gap: 10px;
-        }
-        
-        .icon-btn {
-            width: 44px;
-            height: 44px;
-            border-radius: 12px;
-            background: #1a1a1a;
-            border: none;
-            color: #fff;
-            font-size: 20px;
-            cursor: pointer;
+            background: var(--accent-gradient);
+            margin: 0 auto 30px;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.2s;
+            font-size: 60px;
+            animation: voiceWave 1.5s infinite ease-in-out;
         }
         
-        .icon-btn:hover {
-            background: #2a2a2a;
-            transform: scale(1.05);
+        @keyframes voiceWave {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
         }
         
-        /* GOAL BANNER */
-        .goal-banner {
-            background: linear-gradient(135deg, #00d4ff, #00ff88);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 20px;
-            color: #0a0a0a;
-        }
-        
-        .goal-status {
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-        
-        .goal-details {
-            display: flex;
-            gap: 15px;
-            font-size: 13px;
-            font-weight: 600;
-            flex-wrap: wrap;
-        }
-        
-        /* STATS */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-        
-        .stat-card {
-            background: #1a1a1a;
-            border-radius: 12px;
-            padding: 16px;
-            text-align: center;
-        }
-        
-        .stat-label {
-            font-size: 11px;
-            color: #888;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 6px;
-        }
-        
-        .stat-value {
-            font-size: 26px;
-            font-weight: 700;
-        }
-        
-        .stat-value.success { color: #00ff88; }
-        .stat-value.warning { color: #ffaa00; }
-        .stat-value.danger { color: #ff4444; }
-        
-        .stat-subtext {
-            font-size: 12px;
-            color: #666;
-            margin-top: 4px;
-        }
-        
-        /* TABS */
-        .tabs {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #1a1a1a;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-        
-        .tabs::-webkit-scrollbar {
-            display: none;
-        }
-        
-        .tab {
-            padding: 10px 16px;
-            background: transparent;
-            border: none;
-            color: #666;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            border-bottom: 3px solid transparent;
-            white-space: nowrap;
-            min-height: 44px;
-        }
-        
-        .tab.active {
-            color: #00d4ff;
-            border-bottom-color: #00d4ff;
-        }
-        
-        .tab-content {
-            display: none;
-        }
-        
-        .tab-content.active {
-            display: block;
-        }
-        
-        /* CHART */
-        .chart-container {
-            background: #1a1a1a;
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 20px;
-        }
-        
-        /* MEALS */
-        .section-title {
-            font-size: 16px;
-            font-weight: 600;
-            margin: 20px 0 12px 0;
-        }
-        
-        .meals-list {
-            display: grid;
-            gap: 10px;
-        }
-        
-        .meal-item {
-            background: #1a1a1a;
-            border-radius: 10px;
-            padding: 14px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .meal-info {
-            flex: 1;
-        }
-        
-        .meal-time {
-            font-size: 11px;
-            color: #666;
-            margin-bottom: 3px;
-        }
-        
-        .meal-name {
-            font-size: 14px;
-            font-weight: 500;
-            margin-bottom: 4px;
-        }
-        
-        .meal-macros {
-            font-size: 12px;
-            color: #888;
-        }
-        
-        .meal-calories {
+        .voice-status {
             font-size: 18px;
-            font-weight: 700;
-            color: #00d4ff;
+            font-weight: 600;
+            margin-bottom: 10px;
         }
         
-        /* SETTINGS MODAL */
+        .voice-instruction {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        /* ========== LOADING SPINNER ========== */
+        .spinner {
+            width: 30px;
+            height: 30px;
+            border: 3px solid var(--bg-secondary);
+            border-top-color: var(--accent-cyan);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* ========== TOAST NOTIFICATIONS ========== */
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            padding: 16px 24px;
+            border-radius: 16px;
+            border: 1px solid var(--border-subtle);
+            font-size: 14px;
+            font-weight: 600;
+            z-index: 10000;
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+        
+        .toast.success {
+            border-color: var(--accent-lime);
+            color: var(--accent-lime);
+        }
+        
+        .toast.error {
+            border-color: #ff4444;
+            color: #ff4444;
+        }
+        
+        /* ========== WEIGHT MODAL ========== */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -373,11 +725,11 @@
             right: 0;
             bottom: 0;
             background: rgba(0, 0, 0, 0.9);
-            z-index: 9998;
             display: none;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            z-index: 9998;
+            backdrop-filter: blur(10px);
         }
         
         .modal-overlay.active {
@@ -385,855 +737,781 @@
         }
         
         .modal {
-            background: #1a1a1a;
-            border-radius: 20px;
-            max-width: 500px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-        
-        .modal-header {
-            padding: 24px 24px 16px 24px;
-            border-bottom: 1px solid #2a2a2a;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            background: var(--bg-card);
+            border-radius: 24px;
+            padding: 30px;
+            max-width: 400px;
+            width: 90%;
+            border: 1px solid var(--border-subtle);
         }
         
         .modal-title {
             font-size: 22px;
             font-weight: 700;
-        }
-        
-        .modal-close {
-            font-size: 28px;
-            background: none;
-            border: none;
-            color: #666;
-            cursor: pointer;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .modal-body {
-            padding: 24px;
-        }
-        
-        .settings-group {
-            margin-bottom: 30px;
-        }
-        
-        .settings-group-title {
-            font-size: 14px;
-            color: #888;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 12px;
-        }
-        
-        .settings-item {
-            background: #0f0f0f;
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 10px;
-        }
-        
-        .settings-label {
-            font-size: 14px;
-            font-weight: 500;
-            margin-bottom: 6px;
-        }
-        
-        .settings-value {
-            font-size: 16px;
-            color: #00d4ff;
-            font-weight: 600;
-        }
-        
-        .btn-danger {
-            background: #ff4444;
-            border: none;
-            border-radius: 12px;
-            padding: 14px 24px;
-            color: #fff;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            width: 100%;
-            min-height: 48px;
-        }
-        
-        .btn-secondary {
-            background: #2a2a2a;
-            border: none;
-            border-radius: 12px;
-            padding: 14px 24px;
-            color: #fff;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            width: 100%;
-            margin-bottom: 10px;
-            min-height: 48px;
-        }
-        
-        /* SHARE CARD */
-        .share-card {
-            background: linear-gradient(135deg, #00d4ff, #00ff88);
-            border-radius: 20px;
-            padding: 40px 30px;
-            text-align: center;
-            color: #0a0a0a;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .share-watermark {
-            position: absolute;
-            bottom: 10px;
-            right: 15px;
-            font-size: 12px;
-            font-weight: 700;
-            opacity: 0.6;
-        }
-        
-        .share-stat {
-            font-size: 48px;
-            font-weight: 700;
-            margin: 20px 0;
-        }
-        
-        .share-text {
-            font-size: 20px;
-            font-weight: 600;
-            margin-bottom: 10px;
-        }
-        
-        .share-subtext {
-            font-size: 14px;
-            opacity: 0.8;
-        }
-        
-        /* LOADING & ERROR */
-        .loading {
-            text-align: center;
-            padding: 40px 20px;
-            color: #666;
-        }
-        
-        .loading-spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid #333;
-            border-top-color: #00d4ff;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            margin: 0 auto 16px;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
-        .error-message {
-            background: rgba(255, 68, 68, 0.1);
-            border: 2px solid #ff4444;
-            border-radius: 12px;
-            padding: 16px;
-            color: #ff4444;
             margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
         }
         
-        .error-text {
-            flex: 1;
+        .form-group {
+            margin-bottom: 20px;
         }
         
-        .retry-btn {
-            background: #ff4444;
-            border: none;
-            border-radius: 8px;
-            padding: 8px 16px;
-            color: #fff;
+        .form-label {
             font-size: 13px;
+            color: var(--text-secondary);
             font-weight: 600;
-            cursor: pointer;
-            min-height: 36px;
-        }
-        
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: #666;
-        }
-        
-        /* MOBILE OPTIMIZATIONS */
-        @media (max-width: 600px) {
-            body {
-                padding: 12px;
-            }
-            
-            h1 {
-                font-size: 28px;
-            }
-            
-            .stat-value {
-                font-size: 22px;
-            }
-            
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            
-            .tab {
-                font-size: 13px;
-                padding: 10px 14px;
-            }
-            
-            .goal-status {
-                font-size: 18px;
-            }
-            
-            .goal-details {
-                font-size: 12px;
-            }
-            
-            .onboarding-modal {
-                padding: 30px 20px;
-            }
-            
-            .onboarding-title {
-                font-size: 24px;
-            }
-            
-            .onboarding-text {
-                font-size: 14px;
-            }
-        }
-        
-        /* TOAST NOTIFICATIONS */
-        .toast {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #1a1a1a;
-            border-radius: 12px;
-            padding: 16px 24px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-            z-index: 10000;
-            display: none;
-            animation: slideUp 0.3s ease;
-        }
-        
-        .toast.active {
+            margin-bottom: 8px;
             display: block;
         }
         
-        @keyframes slideUp {
-            from { opacity: 0; transform: translate(-50%, 20px); }
-            to { opacity: 1; transform: translate(-50%, 0); }
+        .form-input {
+            width: 100%;
+            padding: 14px 16px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-cyan);
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 16px;
+            border-radius: 14px;
+            border: none;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: var(--accent-gradient);
+            color: #000;
+        }
+        
+        .btn-secondary {
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-subtle);
+        }
+        
+        .btn:active {
+            transform: scale(0.98);
+        }
+        
+        /* ========== MOBILE OPTIMIZATIONS ========== */
+        @media (max-width: 600px) {
+            .app-container {
+                padding: 0 15px 100px;
+            }
+            
+            .header {
+                padding: 15px 0 20px;
+            }
+            
+            .voice-fab {
+                width: 65px;
+                height: 65px;
+                bottom: 25px;
+                right: 25px;
+            }
+            
+            .camera-fab {
+                width: 55px;
+                height: 55px;
+                bottom: 25px;
+                left: 25px;
+            }
+        }
+        
+        /* ========== SMOOTH SCROLL SNAP ========== */
+        .meals-scroll {
+            scroll-padding-left: 20px;
+        }
+        
+        /* ========== GPU ACCELERATION ========== */
+        .voice-fab,
+        .camera-fab,
+        .meal-card,
+        .photo-card,
+        .quick-add-btn,
+        .streak-fire,
+        .calorie-fill {
+            will-change: transform;
+            transform: translateZ(0);
+            -webkit-transform: translateZ(0);
+        }
+        
+        /* ========== HAPTIC FEEDBACK INDICATOR ========== */
+        .haptic-feedback {
+            animation: haptic 0.1s ease;
+        }
+        
+        @keyframes haptic {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(0.95); }
         }
     </style>
 </head>
 <body>
-    <!-- ONBOARDING OVERLAY -->
-    <div class="onboarding-overlay" id="onboarding">
-        <div class="onboarding-modal">
-            <!-- Step 1: Welcome -->
-            <div class="onboarding-step active" id="onboarding-step-1">
-                <div class="onboarding-icon">🎯</div>
-                <div class="onboarding-title">Welcome to Lean</div>
-                <div class="onboarding-text">
-                    Log meals in 3 seconds. No typing, no searching, no BS.
-                    Just speak or snap — we'll handle the rest.
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-top">
+                <div class="header-title">
+                    <div class="date-label" id="currentDate">Today</div>
+                    <h1 class="app-logo">Lean</h1>
                 </div>
-                <button class="onboarding-btn" onclick="nextOnboardingStep(2)">Get Started</button>
-                <div class="onboarding-progress">
-                    <div class="progress-dot active"></div>
-                    <div class="progress-dot"></div>
-                    <div class="progress-dot"></div>
-                </div>
+                <button class="settings-btn" onclick="openSettings()">⚙️</button>
             </div>
             
-            <!-- Step 2: Demo -->
-            <div class="onboarding-step" id="onboarding-step-2">
-                <div class="onboarding-title">Two Ways to Log</div>
-                <div class="onboarding-text">
-                    Voice logging or photo recognition. Your choice.
-                </div>
-                <div class="demo-buttons">
-                    <button class="demo-button" title="Voice Log">🎤</button>
-                    <button class="demo-button" title="Photo Log">📸</button>
-                </div>
-                <div class="onboarding-text" style="font-size: 14px; margin-top: 20px;">
-                    Tap either button anytime to log a meal instantly.
-                </div>
-                <button class="onboarding-btn" onclick="nextOnboardingStep(3)">Next</button>
-                <div class="onboarding-progress">
-                    <div class="progress-dot"></div>
-                    <div class="progress-dot active"></div>
-                    <div class="progress-dot"></div>
+            <!-- Streak Display -->
+            <div class="streak-display" id="streakDisplay">
+                <div class="streak-fire" id="streakFire">🔥</div>
+                <div class="streak-info">
+                    <div class="streak-count" id="streakCount">0</div>
+                    <div class="streak-label">Day Streak</div>
+                    <div class="streak-dots" id="streakDots">
+                        <!-- 7 dots will be generated -->
+                    </div>
                 </div>
             </div>
-            
-            <!-- Step 3: Goal -->
-            <div class="onboarding-step" id="onboarding-step-3">
-                <div class="onboarding-icon">🔥</div>
-                <div class="onboarding-title">Set Your Goal</div>
-                <div class="onboarding-text">
-                    Let's calculate your personalized calorie target based on your goals.
+        </header>
+        
+        <!-- Progress Photos -->
+        <section class="progress-photos">
+            <h2 class="section-title">Your Progress</h2>
+            <div class="photos-grid">
+                <div class="photo-card empty" id="photoStart" onclick="uploadPhoto('start')">
+                    <div class="icon">📸</div>
+                    <div class="label">Start Photo</div>
                 </div>
-                <button class="onboarding-btn" onclick="finishOnboarding()">Set My Goal</button>
-                <div class="onboarding-skip" onclick="skipOnboarding()">Skip for now</div>
-                <div class="onboarding-progress">
-                    <div class="progress-dot"></div>
-                    <div class="progress-dot"></div>
-                    <div class="progress-dot active"></div>
+                <div class="photo-card empty" id="photoNow" onclick="uploadPhoto('now')">
+                    <div class="icon">📸</div>
+                    <div class="label">Today</div>
                 </div>
             </div>
-        </div>
-    </div>
-    
-    <!-- HEADER -->
-    <div class="header">
-        <div class="header-left">
-            <div class="date" id="current-date">Loading...</div>
-            <h1>Lean</h1>
-        </div>
-        <div class="header-actions">
-            <button class="icon-btn" onclick="shareProgress()" title="Share Progress">📊</button>
-            <button class="icon-btn" onclick="openSettings()" title="Settings">⚙️</button>
-        </div>
-    </div>
-    
-    <!-- GOAL BANNER -->
-    <div class="goal-banner" id="goal-banner">
-        <div class="goal-status" id="goal-status">Loading...</div>
-        <div class="goal-details">
-            <span id="weight-progress">-- lbs lost</span>
-            <span id="days-to-goal">-- days to goal</span>
-            <span id="deficit-banked">-- cal banked</span>
-        </div>
-    </div>
-    
-    <!-- STATS -->
-    <div class="stats-grid">
-        <div class="stat-card">
-            <div class="stat-label">Streak</div>
-            <div class="stat-value success" id="streak">0🔥</div>
-            <div class="stat-subtext">days</div>
-        </div>
+            <button class="share-card-btn" onclick="generateShareCard()">
+                <span>📤</span>
+                <span>Share Your Progress</span>
+            </button>
+        </section>
         
-        <div class="stat-card">
-            <div class="stat-label">Today</div>
-            <div class="stat-value" id="today-cal">0</div>
-            <div class="stat-subtext">/ <span id="cal-goal">2200</span></div>
-        </div>
+        <!-- Calorie Bar -->
+        <section class="calorie-section">
+            <h2 class="section-title">Today's Fuel</h2>
+            <div class="calorie-bar-container">
+                <div class="calorie-bar">
+                    <div class="calorie-fill" id="calorieFill" style="width: 0%"></div>
+                </div>
+                <div class="calorie-status">
+                    <div class="status-emoji" id="statusEmoji">🎯</div>
+                    <div class="status-text" id="statusText">Perfect pace</div>
+                </div>
+            </div>
+        </section>
         
-        <div class="stat-card">
-            <div class="stat-label">Deficit</div>
-            <div class="stat-value" id="today-deficit">0</div>
-            <div class="stat-subtext">cal</div>
-        </div>
+        <!-- Recent Meals -->
+        <section class="meals-section">
+            <h2 class="section-title">Recent Meals</h2>
+            <div class="meals-scroll" id="mealsScroll">
+                <!-- Meal cards will be inserted here -->
+            </div>
+        </section>
         
-        <div class="stat-card">
-            <div class="stat-label">Protein</div>
-            <div class="stat-value" id="protein-today">0</div>
-            <div class="stat-subtext">/ <span id="protein-goal">200</span>g</div>
-        </div>
-    </div>
-    
-    <!-- ERROR MESSAGE (hidden by default) -->
-    <div class="error-message" id="error-message" style="display: none;">
-        <div class="error-text" id="error-text"></div>
-        <button class="retry-btn" onclick="retryLoad()">Retry</button>
-    </div>
-    
-    <!-- TABS -->
-    <div class="tabs">
-        <button class="tab active" onclick="switchTab('dashboard')">Dashboard</button>
-        <button class="tab" onclick="switchTab('history')">History</button>
-    </div>
-    
-    <!-- DASHBOARD TAB -->
-    <div id="dashboard-tab" class="tab-content active">
-        <div class="chart-container">
-            <canvas id="calorieChart"></canvas>
-        </div>
+        <!-- Quick Add Button (shows panel) -->
+        <button class="camera-fab" onclick="toggleQuickAdd()">
+            ➕
+        </button>
         
-        <div class="section-title">Today's Meals</div>
-        <div id="meals-loading" class="loading">
-            <div class="loading-spinner"></div>
-            <div>Loading meals...</div>
+        <!-- Voice FAB -->
+        <button class="voice-fab" id="voiceFab" ontouchstart="startVoiceRecording(event)" ontouchend="stopVoiceRecording(event)" onmousedown="startVoiceRecording(event)" onmouseup="stopVoiceRecording(event)">
+            🎤
+        </button>
+    </div>
+    
+    <!-- Quick Add Panel -->
+    <div class="quick-add-panel" id="quickAddPanel">
+        <div class="panel-header">
+            <h3 class="panel-title">Quick Add</h3>
+            <button class="panel-close" onclick="toggleQuickAdd()">✕</button>
         </div>
-        <div class="meals-list" id="meals-list"></div>
+        <div class="quick-add-grid" id="quickAddGrid">
+            <!-- Quick add buttons will be generated -->
+        </div>
     </div>
     
-    <!-- HISTORY TAB -->
-    <div id="history-tab" class="tab-content">
-        <div class="empty-state">History view coming soon</div>
+    <!-- Voice Recording Modal -->
+    <div class="voice-modal" id="voiceModal">
+        <div class="voice-modal-content">
+            <div class="voice-wave">🎤</div>
+            <div class="voice-status" id="voiceStatus">Listening...</div>
+            <div class="voice-instruction">Release to send</div>
+        </div>
     </div>
     
-    <!-- SETTINGS MODAL -->
-    <div class="modal-overlay" id="settings-modal">
+    <!-- Weight Modal -->
+    <div class="modal-overlay" id="weightModal">
         <div class="modal">
-            <div class="modal-header">
-                <div class="modal-title">Settings</div>
-                <button class="modal-close" onclick="closeSettings()">×</button>
+            <h3 class="modal-title">Log Your Weight</h3>
+            <div class="form-group">
+                <label class="form-label">Weight (lbs)</label>
+                <input type="number" class="form-input" id="weightInput" placeholder="175" step="0.1">
             </div>
-            <div class="modal-body">
-                <div class="settings-group">
-                    <div class="settings-group-title">Account</div>
-                    <div class="settings-item">
-                        <div class="settings-label">Email</div>
-                        <div class="settings-value" id="settings-email">user@example.com</div>
-                    </div>
-                    <div class="settings-item">
-                        <div class="settings-label">Member Since</div>
-                        <div class="settings-value" id="settings-joined">Jan 2025</div>
-                    </div>
-                </div>
-                
-                <div class="settings-group">
-                    <div class="settings-group-title">Data</div>
-                    <button class="btn-secondary" onclick="exportData()">📥 Export My Data</button>
-                </div>
-                
-                <div class="settings-group">
-                    <div class="settings-group-title">Legal</div>
-                    <button class="btn-secondary" onclick="showPrivacyPolicy()">Privacy Policy</button>
-                    <button class="btn-secondary" onclick="showTerms()">Terms of Service</button>
-                </div>
-                
-                <div class="settings-group">
-                    <button class="btn-danger" onclick="confirmDeleteAccount()">Delete Account</button>
-                </div>
+            <div class="form-group">
+                <label class="form-label">Notes (optional)</label>
+                <input type="text" class="form-input" id="weightNotes" placeholder="Morning weight">
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeWeightModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="saveWeight()">Save</button>
             </div>
         </div>
     </div>
     
-    <!-- SHARE MODAL (hidden, used for canvas capture) -->
-    <div style="position: fixed; left: -9999px; top: -9999px;">
-        <div class="share-card" id="share-card" style="width: 600px;">
-            <div class="share-text">Lost</div>
-            <div class="share-stat" id="share-lbs">12 lbs</div>
-            <div class="share-text" id="share-days">in 45 days with Lean</div>
-            <div class="share-watermark">🔥 trylean.app</div>
-        </div>
-    </div>
-    
-    <!-- TOAST NOTIFICATION -->
+    <!-- Toast Notification -->
     <div class="toast" id="toast"></div>
     
+    <!-- Hidden File Input for Photos -->
+    <input type="file" id="photoInput" accept="image/*" capture="environment" style="display: none;" onchange="handlePhotoUpload(event)">
+    
     <script>
-        let chart = null;
-        let currentTab = 'dashboard';
-        let hasError = false;
+        // ========== STATE ==========
+        let appState = {
+            streak: 0,
+            longestStreak: 0,
+            loggedToday: false,
+            caloriesConsumed: 0,
+            calorieGoal: 2200,
+            meals: [],
+            isRecording: false,
+            recordingStartTime: null,
+            mediaRecorder: null,
+            audioChunks: []
+        };
         
-        // ONBOARDING
-        function checkOnboarding() {
-            const completed = localStorage.getItem('lean_onboarding_completed');
-            if (!completed) {
-                document.getElementById('onboarding').classList.add('active');
+        // ========== INIT ==========
+        document.addEventListener('DOMContentLoaded', () => {
+            loadDashboardData();
+            initStreakDots();
+            initQuickAddButtons();
+            updateDate();
+        });
+        
+        function updateDate() {
+            const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            const now = new Date();
+            const dayName = days[now.getDay()];
+            const monthName = months[now.getMonth()];
+            const date = now.getDate();
+            document.getElementById('currentDate').textContent = `${dayName}, ${monthName} ${date}`;
+        }
+        
+        function initStreakDots() {
+            const dotsContainer = document.getElementById('streakDots');
+            dotsContainer.innerHTML = '';
+            for (let i = 0; i < 7; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'streak-dot';
+                dot.id = `dot-${i}`;
+                dotsContainer.appendChild(dot);
             }
         }
         
-        function nextOnboardingStep(step) {
-            document.querySelectorAll('.onboarding-step').forEach(s => s.classList.remove('active'));
-            document.getElementById(`onboarding-step-${step}`).classList.add('active');
-        }
-        
-        function skipOnboarding() {
-            localStorage.setItem('lean_onboarding_completed', 'true');
-            document.getElementById('onboarding').classList.remove('active');
-        }
-        
-        function finishOnboarding() {
-            localStorage.setItem('lean_onboarding_completed', 'true');
-            document.getElementById('onboarding').classList.remove('active');
-            // Open calculator modal (if available)
-            showToast('Welcome to Lean! 🎉');
-        }
-        
-        // TABS
-        function switchTab(tab) {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            event.target.classList.add('active');
+        function initQuickAddButtons() {
+            const commonMeals = [
+                { emoji: '🍗', name: 'Chicken & Rice', cal: 450, protein: 45 },
+                { emoji: '🥙', name: 'Protein Wrap', cal: 380, protein: 35 },
+                { emoji: '🍌', name: 'Banana', cal: 105, protein: 1 },
+                { emoji: '🥚', name: 'Eggs (2)', cal: 140, protein: 12 },
+                { emoji: '🧀', name: 'Cottage Cheese', cal: 200, protein: 28 },
+                { emoji: '☕', name: 'Protein Shake', cal: 250, protein: 30 }
+            ];
             
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            document.getElementById(tab + '-tab').classList.add('active');
+            const grid = document.getElementById('quickAddGrid');
+            grid.innerHTML = commonMeals.map(meal => `
+                <div class="quick-add-btn" onclick="quickAddMeal('${meal.name}', ${meal.cal}, ${meal.protein})">
+                    <div class="emoji">${meal.emoji}</div>
+                    <div class="name">${meal.name}</div>
+                    <div class="cals">${meal.cal} cal</div>
+                </div>
+            `).join('');
+        }
+        
+        // ========== LOAD DATA ==========
+        async function loadDashboardData() {
+            try {
+                // Load streak
+                const streakRes = await fetch('/api/streak');
+                const streakData = await streakRes.json();
+                updateStreak(streakData.current, streakData.logged_today);
+                
+                // Load today's data
+                const todayRes = await fetch('/api/today');
+                const todayData = await todayRes.json();
+                updateCalories(todayData.totals.calories, todayData.goals.calories);
+                updateMeals(todayData.meals);
+                
+                // Load progress photos
+                loadProgressPhotos();
+                
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+                showToast('Failed to load data', 'error');
+            }
+        }
+        
+        // ========== STREAK ==========
+        function updateStreak(count, loggedToday) {
+            appState.streak = count;
+            appState.loggedToday = loggedToday;
             
-            currentTab = tab;
+            const fire = document.getElementById('streakFire');
+            const countEl = document.getElementById('streakCount');
+            const display = document.getElementById('streakDisplay');
+            
+            countEl.textContent = count;
+            
+            // Scale fire emoji based on streak
+            let scale = 1 + (count * 0.02);
+            scale = Math.min(scale, 2); // Max 2x size
+            fire.style.fontSize = `${48 * scale}px`;
+            
+            if (loggedToday) {
+                display.classList.add('active');
+                fire.classList.add('bounce');
+                setTimeout(() => fire.classList.remove('bounce'), 600);
+            }
+            
+            // Update dots (last 7 days)
+            updateStreakDots(count);
         }
         
-        // SETTINGS
-        function openSettings() {
-            document.getElementById('settings-modal').classList.add('active');
-            loadSettings();
-        }
-        
-        function closeSettings() {
-            document.getElementById('settings-modal').classList.remove('active');
-        }
-        
-        function loadSettings() {
-            // Load user settings (placeholder data)
-            document.getElementById('settings-email').textContent = 'demo@lean.app';
-            document.getElementById('settings-joined').textContent = new Date().toLocaleDateString('en-US', {month: 'short', year: 'numeric'});
-        }
-        
-        function exportData() {
-            showToast('Exporting your data...');
-            fetch('/api/export_data')
-                .then(res => res.blob())
-                .then(blob => {
-                    const url = window.URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = `lean_data_${new Date().toISOString().split('T')[0]}.json`;
-                    a.click();
-                    showToast('✅ Data exported!');
-                })
-                .catch(err => {
-                    showToast('❌ Export failed');
-                });
-        }
-        
-        function showPrivacyPolicy() {
-            alert('Privacy Policy\n\nYour data is stored locally and never shared without your consent. Full policy coming soon.');
-        }
-        
-        function showTerms() {
-            alert('Terms of Service\n\nBy using Lean, you agree to our terms. Full terms coming soon.');
-        }
-        
-        function confirmDeleteAccount() {
-            if (confirm('Are you sure you want to delete your account? This cannot be undone.')) {
-                if (confirm('Really delete all your data? Last chance!')) {
-                    showToast('Account deleted');
-                    setTimeout(() => {
-                        window.location.href = '/';
-                    }, 2000);
+        function updateStreakDots(streak) {
+            for (let i = 0; i < 7; i++) {
+                const dot = document.getElementById(`dot-${i}`);
+                if (i < streak && i < 7) {
+                    dot.classList.add('active');
+                } else {
+                    dot.classList.remove('active');
                 }
             }
         }
         
-        // SHARE FEATURE
-        async function shareProgress() {
-            try {
-                showToast('Generating share card...');
-                
-                // Get current stats
-                const projRes = await fetch('/api/goal_projection');
-                const proj = await projRes.json();
-                
-                if (proj.error) {
-                    showToast('❌ Set your goals first');
-                    return;
-                }
-                
-                // Update share card content
-                document.getElementById('share-lbs').textContent = `${proj.lbs_lost.toFixed(1)} lbs`;
-                document.getElementById('share-days').textContent = `in ${proj.days_tracked} days with Lean`;
-                
-                // Capture as image using html2canvas
-                const shareCard = document.getElementById('share-card');
-                const canvas = await html2canvas(shareCard, {
-                    backgroundColor: null,
-                    scale: 2
-                });
-                
-                // Convert to blob
-                canvas.toBlob(async (blob) => {
-                    // Try native share API first (mobile)
-                    if (navigator.share && navigator.canShare && navigator.canShare({ files: [new File([blob], 'lean-progress.png', { type: 'image/png' })] })) {
-                        try {
-                            await navigator.share({
-                                files: [new File([blob], 'lean-progress.png', { type: 'image/png' })],
-                                title: 'My Lean Progress',
-                                text: `Lost ${proj.lbs_lost.toFixed(1)} lbs in ${proj.days_tracked} days!`
-                            });
-                            showToast('✅ Shared!');
-                        } catch (err) {
-                            // User cancelled
-                        }
-                    } else {
-                        // Fallback: download image
-                        const url = URL.createObjectURL(blob);
-                        const a = document.createElement('a');
-                        a.href = url;
-                        a.download = `lean_progress_${new Date().toISOString().split('T')[0]}.png`;
-                        a.click();
-                        URL.revokeObjectURL(url);
-                        showToast('✅ Image saved!');
-                    }
-                    
-                    // Also save to server
-                    const formData = new FormData();
-                    formData.append('image', blob, 'share.png');
-                    fetch('/api/save_share_image', {
-                        method: 'POST',
-                        body: formData
-                    });
-                }, 'image/png');
-                
-            } catch (err) {
-                showToast('❌ Share failed');
-                console.error(err);
-            }
-        }
-        
-        // DATA LOADING
-        async function loadAll() {
-            hasError = false;
-            hideError();
-            showLoading();
+        // ========== CALORIES ==========
+        function updateCalories(consumed, goal) {
+            appState.caloriesConsumed = consumed;
+            appState.calorieGoal = goal;
             
-            try {
-                await Promise.all([
-                    loadToday(),
-                    loadGoalProjection(),
-                    loadTrendChart()
-                ]);
-                hideLoading();
-            } catch (err) {
-                hasError = true;
-                showError('Failed to load data. Check your connection.');
-                console.error(err);
-            }
-        }
-        
-        async function loadToday() {
-            const res = await fetch('/api/today');
-            if (!res.ok) throw new Error('Failed to load today');
+            const percentage = Math.min((consumed / goal) * 100, 100);
+            const fill = document.getElementById('calorieFill');
+            const emoji = document.getElementById('statusEmoji');
+            const text = document.getElementById('statusText');
             
-            const today = await res.json();
+            fill.style.width = `${percentage}%`;
             
-            document.getElementById('current-date').textContent = 
-                new Date(today.date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
-            
-            const todayCal = today.totals.calories;
-            const calGoal = today.goals.calories;
-            const deficit = calGoal - todayCal;
-            
-            const todayEl = document.getElementById('today-cal');
-            todayEl.textContent = todayCal;
-            todayEl.className = 'stat-value ' + (todayCal <= calGoal ? 'success' : 'danger');
-            
-            document.getElementById('cal-goal').textContent = calGoal;
-            document.getElementById('protein-today').textContent = today.totals.protein;
-            document.getElementById('protein-goal').textContent = today.goals.protein;
-            
-            const deficitEl = document.getElementById('today-deficit');
-            deficitEl.textContent = deficit > 0 ? `-${deficit}` : `+${Math.abs(deficit)}`;
-            deficitEl.className = 'stat-value ' + (deficit > 0 ? 'success' : 'danger');
-            
-            // Update meals
-            const mealsList = document.getElementById('meals-list');
-            if (today.meals.length === 0) {
-                mealsList.innerHTML = '<div class="empty-state">No meals logged today</div>';
+            // Update status
+            if (percentage < 30) {
+                emoji.textContent = '🎯';
+                text.textContent = 'Great start';
+            } else if (percentage < 70) {
+                emoji.textContent = '🔥';
+                text.textContent = 'Perfect pace';
+            } else if (percentage < 95) {
+                emoji.textContent = '💪';
+                text.textContent = 'Almost there';
+            } else if (percentage < 105) {
+                emoji.textContent = '✅';
+                text.textContent = 'Nailed it!';
             } else {
-                mealsList.innerHTML = today.meals.map(meal => {
-                    const time = new Date('2000-01-01 ' + meal.time).toLocaleTimeString('en-US', {
-                        hour: 'numeric',
-                        minute: '2-digit'
-                    });
-                    
-                    return `
-                        <div class="meal-item">
-                            <div class="meal-info">
-                                <div class="meal-time">${time}</div>
-                                <div class="meal-name">${meal.description}</div>
-                                <div class="meal-macros">${meal.protein}g P • ${meal.carbs || 0}g C • ${meal.fat || 0}g F</div>
-                            </div>
-                            <div class="meal-calories">${meal.calories}</div>
-                        </div>
-                    `;
-                }).join('');
+                emoji.textContent = '⚠️';
+                text.textContent = 'Over target';
             }
         }
         
-        async function loadGoalProjection() {
-            const res = await fetch('/api/goal_projection');
-            if (!res.ok) throw new Error('Failed to load projection');
+        // ========== MEALS ==========
+        function updateMeals(meals) {
+            appState.meals = meals;
+            const container = document.getElementById('mealsScroll');
             
-            const proj = await res.json();
-            
-            // Load streak separately
-            const streakRes = await fetch('/api/streak');
-            const streakData = await streakRes.json();
-            document.getElementById('streak').textContent = `${streakData.current}🔥`;
-            
-            if (proj.error) {
-                document.getElementById('goal-status').textContent = 'Set your goals to track progress';
-                document.getElementById('weight-progress').textContent = '-- lbs lost';
-                document.getElementById('days-to-goal').textContent = '-- days to goal';
-                document.getElementById('deficit-banked').textContent = '-- cal banked';
+            if (!meals || meals.length === 0) {
+                container.innerHTML = `
+                    <div style="padding: 40px; text-align: center; color: var(--text-muted); width: 100%;">
+                        <div style="font-size: 48px; margin-bottom: 15px;">🍽️</div>
+                        <div style="font-size: 15px; font-weight: 600;">No meals yet today</div>
+                        <div style="font-size: 13px; margin-top: 5px;">Tap the microphone to log your first meal</div>
+                    </div>
+                `;
                 return;
             }
             
-            document.getElementById('goal-status').textContent = proj.status_text;
-            document.getElementById('weight-progress').textContent = `${proj.lbs_lost.toFixed(1)} lbs lost`;
-            document.getElementById('days-to-goal').textContent = `${proj.days_to_goal} days to goal`;
-            document.getElementById('deficit-banked').textContent = `${proj.total_deficit.toLocaleString()} cal banked 🔥`;
+            const mealIcons = {
+                'breakfast': '🌅',
+                'lunch': '☀️',
+                'dinner': '🌙',
+                'snack': '🍎'
+            };
+            
+            container.innerHTML = meals.slice(-5).reverse().map(meal => {
+                const icon = mealIcons[meal.meal_type?.toLowerCase()] || '🍽️';
+                return `
+                    <div class="meal-card">
+                        <div class="meal-header">
+                            <div class="meal-time">${meal.time || 'Just now'}</div>
+                            <div class="meal-icon">${icon}</div>
+                        </div>
+                        <div class="meal-name">${meal.description || meal.food || 'Meal'}</div>
+                        <div class="meal-macros">
+                            <div class="macro-item">
+                                <div class="macro-value">${meal.calories}</div>
+                                <div class="macro-label">Cal</div>
+                            </div>
+                            <div class="macro-item">
+                                <div class="macro-value">${meal.protein}g</div>
+                                <div class="macro-label">Protein</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
         }
         
-        async function loadTrendChart() {
-            const res = await fetch('/api/last_14_days');
-            if (!res.ok) throw new Error('Failed to load trend');
+        // ========== VOICE RECORDING ==========
+        let recordingTimeout;
+        
+        function startVoiceRecording(event) {
+            event.preventDefault();
             
-            const data = await res.json();
+            if (appState.isRecording) return;
             
-            const ctx = document.getElementById('calorieChart').getContext('2d');
+            const fab = document.getElementById('voiceFab');
+            const modal = document.getElementById('voiceModal');
             
-            if (chart) chart.destroy();
+            fab.classList.add('recording');
+            modal.classList.add('active');
             
-            const labels = data.map(d => new Date(d.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
-            const calories = data.map(d => d.calories);
-            const targetLine = data.map(() => 2200);
+            appState.isRecording = true;
+            appState.recordingStartTime = Date.now();
             
-            chart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [
-                        {
-                            label: 'Calories',
-                            data: calories,
-                            borderColor: '#00d4ff',
-                            backgroundColor: 'rgba(0, 212, 255, 0.1)',
-                            borderWidth: 3,
-                            tension: 0.3,
-                            fill: true,
-                            pointRadius: 4,
-                            pointBackgroundColor: calories.map(c => c <= 2200 ? '#00ff88' : '#ff4444'),
-                            pointBorderColor: '#fff',
-                            pointBorderWidth: 2
-                        },
-                        {
-                            label: 'Target',
-                            data: targetLine,
-                            borderColor: '#666',
-                            borderWidth: 2,
-                            borderDash: [5, 5],
-                            fill: false,
-                            pointRadius: 0
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    aspectRatio: 2.2,
-                    plugins: {
-                        legend: { display: false }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: false,
-                            grid: { color: '#222' },
-                            ticks: { color: '#666' }
-                        },
-                        x: {
-                            grid: { display: false },
-                            ticks: { color: '#666' }
-                        }
+            // Haptic feedback (if supported)
+            if (navigator.vibrate) {
+                navigator.vibrate(50);
+            }
+            
+            // Start actual recording
+            startAudioRecording();
+        }
+        
+        function stopVoiceRecording(event) {
+            event.preventDefault();
+            
+            if (!appState.isRecording) return;
+            
+            const fab = document.getElementById('voiceFab');
+            const modal = document.getElementById('voiceModal');
+            
+            fab.classList.remove('recording');
+            modal.classList.remove('active');
+            
+            const duration = Date.now() - appState.recordingStartTime;
+            
+            if (duration < 500) {
+                // Too short, ignore
+                appState.isRecording = false;
+                stopAudioRecording();
+                return;
+            }
+            
+            // Process recording
+            stopAudioRecording();
+            processVoiceLog();
+            
+            appState.isRecording = false;
+        }
+        
+        async function startAudioRecording() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                appState.mediaRecorder = new MediaRecorder(stream);
+                appState.audioChunks = [];
+                
+                appState.mediaRecorder.addEventListener('dataavailable', event => {
+                    appState.audioChunks.push(event.data);
+                });
+                
+                appState.mediaRecorder.start();
+            } catch (error) {
+                console.error('Error starting recording:', error);
+                showToast('Microphone access denied', 'error');
+            }
+        }
+        
+        function stopAudioRecording() {
+            if (appState.mediaRecorder && appState.mediaRecorder.state !== 'inactive') {
+                appState.mediaRecorder.stop();
+                appState.mediaRecorder.stream.getTracks().forEach(track => track.stop());
+            }
+        }
+        
+        async function processVoiceLog() {
+            showToast('Processing...', 'info');
+            
+            try {
+                const audioBlob = new Blob(appState.audioChunks, { type: 'audio/webm' });
+                const formData = new FormData();
+                formData.append('audio', audioBlob, 'recording.webm');
+                
+                const response = await fetch('/api/voice_log', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Add meal
+                    await logMeal(result.meal);
+                    showToast(`Logged: ${result.meal.food}`, 'success');
+                    triggerConfetti();
+                } else {
+                    showToast(result.error || 'Failed to process', 'error');
+                }
+            } catch (error) {
+                console.error('Error processing voice:', error);
+                showToast('Failed to log meal', 'error');
+            }
+        }
+        
+        // ========== QUICK ADD ==========
+        function toggleQuickAdd() {
+            const panel = document.getElementById('quickAddPanel');
+            panel.classList.toggle('active');
+        }
+        
+        async function quickAddMeal(name, calories, protein) {
+            const meal = {
+                description: name,
+                calories: calories,
+                protein: protein,
+                carbs: 0,
+                fat: 0
+            };
+            
+            await logMeal(meal);
+            toggleQuickAdd();
+            showToast(`Logged: ${name}`, 'success');
+            triggerConfetti();
+        }
+        
+        async function logMeal(meal) {
+            try {
+                const response = await fetch('/api/add_meal', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(meal)
+                });
+                
+                if (response.ok) {
+                    // Reload dashboard
+                    await loadDashboardData();
+                }
+            } catch (error) {
+                console.error('Error logging meal:', error);
+                throw error;
+            }
+        }
+        
+        // ========== PHOTOS ==========
+        let currentPhotoType = null;
+        
+        function uploadPhoto(type) {
+            currentPhotoType = type;
+            document.getElementById('photoInput').click();
+        }
+        
+        async function handlePhotoUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            showToast('Uploading photo...', 'info');
+            
+            // Convert to base64
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                const base64 = e.target.result;
+                
+                try {
+                    // Save photo
+                    const response = await fetch('/api/upload_progress_photo', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            photo_url: base64,
+                            weight: null // Will prompt for weight
+                        })
+                    });
+                    
+                    if (response.ok) {
+                        showToast('Photo uploaded!', 'success');
+                        loadProgressPhotos();
+                        
+                        // Prompt for weight
+                        openWeightModal();
+                    }
+                } catch (error) {
+                    console.error('Error uploading photo:', error);
+                    showToast('Failed to upload', 'error');
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        async function loadProgressPhotos() {
+            try {
+                const response = await fetch('/api/progress_photos');
+                const photos = await response.json();
+                
+                if (photos && photos.length > 0) {
+                    // Show first and last photo
+                    const firstPhoto = photos[0];
+                    const lastPhoto = photos[photos.length - 1];
+                    
+                    updatePhotoCard('photoStart', firstPhoto);
+                    if (photos.length > 1) {
+                        updatePhotoCard('photoNow', lastPhoto);
                     }
                 }
-            });
+            } catch (error) {
+                console.error('Error loading photos:', error);
+            }
         }
         
-        function retryLoad() {
-            loadAll();
+        function updatePhotoCard(cardId, photo) {
+            const card = document.getElementById(cardId);
+            card.className = 'photo-card';
+            card.innerHTML = `
+                <img src="${photo.photo_url}" alt="Progress photo">
+                <div class="photo-overlay">
+                    <div class="photo-date">${photo.date}</div>
+                    ${photo.weight ? `<div class="photo-weight">${photo.weight} lbs</div>` : ''}
+                </div>
+            `;
         }
         
-        function showError(message) {
-            document.getElementById('error-text').textContent = message;
-            document.getElementById('error-message').style.display = 'flex';
+        // ========== SHARE CARD ==========
+        async function generateShareCard() {
+            showToast('Generating share card...', 'info');
+            
+            try {
+                const response = await fetch('/api/progress_card');
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Open modal with shareable image
+                    showToast('Card ready!', 'success');
+                    // TODO: Implement share card modal
+                }
+            } catch (error) {
+                console.error('Error generating card:', error);
+                showToast('Failed to generate card', 'error');
+            }
         }
         
-        function hideError() {
-            document.getElementById('error-message').style.display = 'none';
+        // ========== WEIGHT MODAL ==========
+        function openWeightModal() {
+            document.getElementById('weightModal').classList.add('active');
         }
         
-        function showLoading() {
-            document.getElementById('meals-loading').style.display = 'block';
+        function closeWeightModal() {
+            document.getElementById('weightModal').classList.remove('active');
+            document.getElementById('weightInput').value = '';
+            document.getElementById('weightNotes').value = '';
         }
         
-        function hideLoading() {
-            document.getElementById('meals-loading').style.display = 'none';
+        async function saveWeight() {
+            const weight = parseFloat(document.getElementById('weightInput').value);
+            const notes = document.getElementById('weightNotes').value;
+            
+            if (!weight) {
+                showToast('Enter your weight', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/weight', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ weight, notes })
+                });
+                
+                if (response.ok) {
+                    showToast('Weight logged!', 'success');
+                    closeWeightModal();
+                    loadDashboardData();
+                }
+            } catch (error) {
+                console.error('Error saving weight:', error);
+                showToast('Failed to save', 'error');
+            }
         }
         
-        function showToast(message) {
+        // ========== CONFETTI ==========
+        function triggerConfetti() {
+            const colors = ['#00d4ff', '#00ff88', '#ff00ff', '#ffaa00'];
+            
+            for (let i = 0; i < 30; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + '%';
+                    confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.animationDelay = Math.random() * 0.5 + 's';
+                    document.body.appendChild(confetti);
+                    
+                    setTimeout(() => confetti.remove(), 3000);
+                }, i * 30);
+            }
+        }
+        
+        // ========== TOAST ==========
+        function showToast(message, type = 'info') {
             const toast = document.getElementById('toast');
             toast.textContent = message;
-            toast.classList.add('active');
+            toast.className = `toast ${type}`;
+            toast.classList.add('show');
+            
             setTimeout(() => {
-                toast.classList.remove('active');
+                toast.classList.remove('show');
             }, 3000);
         }
         
-        // INIT
-        checkOnboarding();
-        loadAll();
-        
-        // Auto-refresh
-        setInterval(() => {
-            if (currentTab === 'dashboard' && !hasError) {
-                loadAll();
-            }
-        }, 60000);
-    </script>
-    
-    <!-- Voice Logging Component -->
-    {% include 'voice_button.html' %}
-    
-    <!-- Lean Goal Calculator -->
-    {% include 'lean_calculator.html' %}
-    
-    <!-- Referral System -->
-    {% include 'referral_modal.html' %}
-    
-    <!-- Pricing/Upgrade -->
-    {% include 'pricing_modal.html' %}
-    
-    <!-- Weight Tracking Modal -->
-    {% include 'weight_modal.html' %}
-    
-    <!-- Progress Card Generator -->
-    {% include 'progress_card_modal.html' %}
-    
-    <!-- Add buttons to header -->
-    <script>
-    // Add referral and upgrade buttons
-    window.addEventListener('DOMContentLoaded', () => {
-        const header = document.querySelector('.header');
-        if (header) {
-            const buttonContainer = document.createElement('div');
-            buttonContainer.style.cssText = 'display: flex; gap: 10px; margin-top: 10px;';
-            
-            const referralBtn = document.createElement('button');
-            referralBtn.textContent = '🎁 Invite Friends';
-            referralBtn.style.cssText = 'padding: 8px 16px; background: linear-gradient(135deg, #00d4ff, #00ff88); color: #0a0a0a; border: none; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer;';
-            referralBtn.onclick = openReferralModal;
-            
-            const upgradeBtn = document.createElement('button');
-            upgradeBtn.textContent = '⚡ Upgrade to Pro';
-            upgradeBtn.style.cssText = 'padding: 8px 16px; background: #2a2a2a; color: #fff; border: none; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer;';
-            upgradeBtn.onclick = openPricingModal;
-            
-            buttonContainer.appendChild(referralBtn);
-            buttonContainer.appendChild(upgradeBtn);
-            header.appendChild(buttonContainer);
+        // ========== SETTINGS ==========
+        function openSettings() {
+            window.location.href = '/settings';
         }
-    });
+        
+        // ========== PREVENT BOUNCE SCROLLING (iOS) ==========
+        document.addEventListener('touchmove', function(e) {
+            if (e.target.closest('.meals-scroll')) {
+                return;
+            }
+            if (document.body.scrollHeight <= window.innerHeight) {
+                e.preventDefault();
+            }
+        }, { passive: false });
     </script>
 </body>
 </html>
