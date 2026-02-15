@@ -1,0 +1,397 @@
+<!-- Lean Goal Calculator Modal -->
+<style>
+.lean-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 3000;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+.lean-modal.show {
+    display: flex;
+}
+
+.lean-content {
+    background: #1a1a1a;
+    border-radius: 20px;
+    padding: 30px;
+    max-width: 500px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.lean-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.lean-title {
+    font-size: 28px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #00d4ff, #00ff88);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 8px;
+}
+
+.lean-subtitle {
+    font-size: 14px;
+    color: #888;
+}
+
+.lean-form-group {
+    margin-bottom: 20px;
+}
+
+.lean-label {
+    display: block;
+    font-size: 12px;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+}
+
+.lean-input {
+    width: 100%;
+    padding: 14px;
+    background: #0a0a0a;
+    border: 2px solid #2a2a2a;
+    border-radius: 12px;
+    color: #fff;
+    font-size: 16px;
+    transition: all 0.2s;
+}
+
+.lean-input:focus {
+    outline: none;
+    border-color: #00d4ff;
+}
+
+.lean-select {
+    width: 100%;
+    padding: 14px;
+    background: #0a0a0a;
+    border: 2px solid #2a2a2a;
+    border-radius: 12px;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.lean-result {
+    background: linear-gradient(135deg, #00d4ff, #00ff88);
+    border-radius: 16px;
+    padding: 20px;
+    margin: 20px 0;
+    color: #0a0a0a;
+    display: none;
+}
+
+.lean-result.show {
+    display: block;
+}
+
+.lean-result-title {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.lean-result-value {
+    font-size: 36px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.lean-result-subtitle {
+    font-size: 12px;
+    opacity: 0.8;
+}
+
+.lean-metrics {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.lean-metric {
+    background: #0a0a0a;
+    border-radius: 12px;
+    padding: 12px;
+    text-align: center;
+}
+
+.lean-metric-value {
+    font-size: 20px;
+    font-weight: 700;
+    color: #00ff88;
+}
+
+.lean-metric-label {
+    font-size: 11px;
+    color: #666;
+    text-transform: uppercase;
+    margin-top: 4px;
+}
+
+.lean-warnings {
+    background: #2a1a1a;
+    border-left: 4px solid #ff4d4d;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    display: none;
+}
+
+.lean-warnings.show {
+    display: block;
+}
+
+.lean-warning-item {
+    font-size: 13px;
+    color: #ff8888;
+    margin: 4px 0;
+}
+
+.lean-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.lean-btn {
+    flex: 1;
+    padding: 16px;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.lean-btn-calculate {
+    background: linear-gradient(135deg, #00d4ff, #00ff88);
+    color: #0a0a0a;
+}
+
+.lean-btn-save {
+    background: linear-gradient(135deg, #00d4ff, #00ff88);
+    color: #0a0a0a;
+    display: none;
+}
+
+.lean-btn-save.show {
+    display: block;
+}
+
+.lean-btn-cancel {
+    background: #2a2a2a;
+    color: #fff;
+}
+
+.lean-trigger {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    padding: 14px 24px;
+    background: linear-gradient(135deg, #00d4ff, #00ff88);
+    color: #0a0a0a;
+    border: none;
+    border-radius: 30px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 8px 24px rgba(0, 212, 255, 0.3);
+    transition: all 0.3s;
+    z-index: 1000;
+}
+
+.lean-trigger:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(0, 212, 255, 0.5);
+}
+</style>
+
+<button class="lean-trigger" onclick="openLeanCalculator()">
+    🎯 Set Goals
+</button>
+
+<div class="lean-modal" id="leanModal">
+    <div class="lean-content">
+        <div class="lean-header">
+            <div class="lean-title">Lean Goal Calculator</div>
+            <div class="lean-subtitle">Science-based calorie targets for your goals</div>
+        </div>
+        
+        <div class="lean-form-group">
+            <label class="lean-label">Current Weight (lbs)</label>
+            <input type="number" class="lean-input" id="leanCurrentWeight" value="225">
+        </div>
+        
+        <div class="lean-form-group">
+            <label class="lean-label">Goal Weight (lbs)</label>
+            <input type="number" class="lean-input" id="leanGoalWeight" value="190">
+        </div>
+        
+        <div class="lean-form-group">
+            <label class="lean-label">Timeline (weeks)</label>
+            <input type="number" class="lean-input" id="leanTimeline" value="26">
+        </div>
+        
+        <div class="lean-form-group">
+            <label class="lean-label">Activity Level</label>
+            <select class="lean-select" id="leanActivity">
+                <option value="sedentary">Sedentary (little/no exercise)</option>
+                <option value="light">Light (1-3 days/week)</option>
+                <option value="moderate" selected>Moderate (3-5 days/week)</option>
+                <option value="active">Active (6-7 days/week)</option>
+                <option value="very_active">Very Active (athlete)</option>
+            </select>
+        </div>
+        
+        <div class="lean-form-group">
+            <label class="lean-label">Age</label>
+            <input type="number" class="lean-input" id="leanAge" value="30">
+        </div>
+        
+        <div class="lean-form-group">
+            <label class="lean-label">Height (inches)</label>
+            <input type="number" class="lean-input" id="leanHeight" value="73">
+        </div>
+        
+        <div class="lean-result" id="leanResult">
+            <div class="lean-result-title">Recommended Daily Target</div>
+            <div class="lean-result-value" id="leanCalories">0</div>
+            <div class="lean-result-subtitle">calories per day</div>
+        </div>
+        
+        <div class="lean-metrics" id="leanMetrics" style="display: none;">
+            <div class="lean-metric">
+                <div class="lean-metric-value" id="leanProtein">0g</div>
+                <div class="lean-metric-label">Protein</div>
+            </div>
+            <div class="lean-metric">
+                <div class="lean-metric-value" id="leanRate">0</div>
+                <div class="lean-metric-label">lbs/week</div>
+            </div>
+            <div class="lean-metric">
+                <div class="lean-metric-value" id="leanTdee">0</div>
+                <div class="lean-metric-label">TDEE</div>
+            </div>
+            <div class="lean-metric">
+                <div class="lean-metric-value" id="leanDeficit">0</div>
+                <div class="lean-metric-label">Daily Deficit</div>
+            </div>
+        </div>
+        
+        <div class="lean-warnings" id="leanWarnings"></div>
+        
+        <div class="lean-buttons">
+            <button class="lean-btn lean-btn-cancel" onclick="closeLeanCalculator()">Cancel</button>
+            <button class="lean-btn lean-btn-calculate" onclick="calculateLean()">Calculate</button>
+            <button class="lean-btn lean-btn-save" id="leanSaveBtn" onclick="saveLeanGoals()">Save & Apply</button>
+        </div>
+    </div>
+</div>
+
+<script>
+let leanCalculation = null;
+
+function openLeanCalculator() {
+    document.getElementById('leanModal').classList.add('show');
+}
+
+function closeLeanCalculator() {
+    document.getElementById('leanModal').classList.remove('show');
+}
+
+async function calculateLean() {
+    const params = {
+        current_weight: parseFloat(document.getElementById('leanCurrentWeight').value),
+        goal_weight: parseFloat(document.getElementById('leanGoalWeight').value),
+        timeline_weeks: parseInt(document.getElementById('leanTimeline').value),
+        activity_level: document.getElementById('leanActivity').value,
+        age: parseInt(document.getElementById('leanAge').value),
+        height_inches: parseInt(document.getElementById('leanHeight').value),
+        gender: 'male'
+    };
+    
+    try {
+        const res = await fetch('/api/calculate_goals', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(params)
+        });
+        
+        const result = await res.json();
+        
+        if (result.success) {
+            leanCalculation = result;
+            
+            // Show results
+            document.getElementById('leanCalories').textContent = result.recommended_calories;
+            document.getElementById('leanProtein').textContent = result.recommended_protein + 'g';
+            document.getElementById('leanRate').textContent = result.weekly_rate;
+            document.getElementById('leanTdee').textContent = result.tdee;
+            document.getElementById('leanDeficit').textContent = result.daily_deficit;
+            
+            document.getElementById('leanResult').classList.add('show');
+            document.getElementById('leanMetrics').style.display = 'grid';
+            document.getElementById('leanSaveBtn').classList.add('show');
+            
+            // Show warnings if any
+            if (result.warnings.length > 0) {
+                const warningsDiv = document.getElementById('leanWarnings');
+                warningsDiv.innerHTML = result.warnings.map(w => `<div class="lean-warning-item">${w}</div>`).join('');
+                warningsDiv.classList.add('show');
+            }
+        } else {
+            alert('Calculation error: ' + result.error);
+        }
+    } catch (err) {
+        alert('Failed to calculate');
+    }
+}
+
+async function saveLeanGoals() {
+    if (!leanCalculation) return;
+    
+    const goals = {
+        current_weight: parseFloat(document.getElementById('leanCurrentWeight').value),
+        goal_weight: parseFloat(document.getElementById('leanGoalWeight').value),
+        target_date: new Date(Date.now() + (leanCalculation.timeline_days * 86400000)).toISOString().split('T')[0],
+        weekly_goal: Math.abs(leanCalculation.weekly_rate),
+        daily_calorie_goal: leanCalculation.recommended_calories,
+        daily_protein_goal: leanCalculation.recommended_protein,
+        started_date: new Date().toISOString().split('T')[0],
+        activity_level: document.getElementById('leanActivity').value,
+        age: parseInt(document.getElementById('leanAge').value),
+        height_inches: parseInt(document.getElementById('leanHeight').value)
+    };
+    
+    try {
+        await fetch('/api/save_goals', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(goals)
+        });
+        
+        alert('✅ Goals saved! Dashboard updated.');
+        closeLeanCalculator();
+        location.reload();
+    } catch (err) {
+        alert('Failed to save goals');
+    }
+}
+</script>

@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fitness Tracker Pro</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #0a0a0a;
+            color: #fff;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            margin-bottom: 20px;
+        }
+        
+        .date {
+            font-size: 14px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        h1 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-top: 5px;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #1a1a1a;
+        }
+        
+        .tab {
+            padding: 12px 20px;
+            background: transparent;
+            border: none;
+            color: #666;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+        }
+        
+        .tab:hover {
+            color: #fff;
+        }
+        
+        .tab.active {
+            color: #00d4ff;
+            border-bottom-color: #00d4ff;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: #1a1a1a;
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+        
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+        }
+        
+        .stat-value.success { color: #00ff88; }
+        .stat-value.warning { color: #ffaa00; }
+        .stat-value.danger { color: #ff4444; }
+        
+        .stat-subtext {
+            font-size: 14px;
+            color: #666;
+            margin-top: 4px;
+        }
+        
+        .chart-container {
+            background: #1a1a1a;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .chart-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin: 30px 0 15px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .meals-list {
+            display: grid;
+            gap: 12px;
+        }
+        
+        .meal-item {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .meal-info {
+            flex: 1;
+        }
+        
+        .meal-time {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 4px;
+        }
+        
+        .meal-name {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 6px;
+        }
+        
+        .meal-macros {
+            font-size: 14px;
+            color: #888;
+        }
+        
+        .meal-calories {
+            font-size: 20px;
+            font-weight: 700;
+            color: #00d4ff;
+        }
+        
+        .deficit-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .deficit-badge.surplus {
+            background: rgba(255, 68, 68, 0.2);
+            color: #ff4444;
+        }
+        
+        .deficit-badge.deficit {
+            background: rgba(0, 255, 136, 0.2);
+            color: #00ff88;
+        }
+        
+        .deficit-badge.target {
+            background: rgba(0, 212, 255, 0.2);
+            color: #00d4ff;
+        }
+        
+        .history-day, .plan-day {
+            background: #1a1a1a;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .history-day-header, .plan-day-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #2a2a2a;
+        }
+        
+        .history-date, .plan-day-name {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .history-totals, .plan-totals {
+            display: flex;
+            gap: 20px;
+            font-size: 14px;
+        }
+        
+        .history-total-item {
+            color: #888;
+        }
+        
+        .history-total-value {
+            color: #00d4ff;
+            font-weight: 600;
+        }
+        
+        .shopping-item {
+            padding: 12px;
+            background: #0f0f0f;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+        
+        @media (max-width: 600px) {
+            body {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 28px;
+            }
+            
+            .stat-value {
+                font-size: 24px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .tab {
+                font-size: 14px;
+                padding: 12px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="date" id="current-date">Loading...</div>
+        <h1>Calorie Tracker</h1>
+    </div>
+    
+    <div class="tabs">
+        <button class="tab active" onclick="switchTab('dashboard')">Dashboard</button>
+        <button class="tab" onclick="switchTab('history')">History</button>
+        <button class="tab" onclick="switchTab('mealprep')">Meal Prep</button>
+    </div>
+    
+    <!-- DASHBOARD TAB -->
+    <div id="dashboard-tab" class="tab-content active">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Today</div>
+                <div class="stat-value" id="today-cal">0</div>
+                <div class="stat-subtext">/ <span id="cal-goal">2200</span> cal</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-label">Deficit</div>
+                <div class="stat-value" id="today-deficit">0</div>
+                <div class="stat-subtext" id="deficit-label">calories</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-label">7-Day Avg</div>
+                <div class="stat-value" id="week-avg">0</div>
+                <div class="stat-subtext">cal/day</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-label">Protein</div>
+                <div class="stat-value" id="protein-today">0</div>
+                <div class="stat-subtext">/ <span id="protein-goal">200</span>g</div>
+            </div>
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-title">14-Day Calorie Trend</div>
+            <canvas id="calorieChart"></canvas>
+        </div>
+        
+        <div class="section-title">
+            <span>Today's Meals</span>
+            <span class="deficit-badge" id="day-badge">Loading...</span>
+        </div>
+        <div class="meals-list" id="meals-list">
+            <div class="empty-state">Loading meals...</div>
+        </div>
+    </div>
+    
+    <!-- HISTORY TAB -->
+    <div id="history-tab" class="tab-content">
+        <div id="history-list">
+            <div class="empty-state">Loading history...</div>
+        </div>
+    </div>
+    
+    <!-- MEAL PREP TAB -->
+    <div id="mealprep-tab" class="tab-content">
+        <div class="stats-grid" style="margin-bottom: 30px;">
+            <div class="stat-card">
+                <div class="stat-label">Weekly Avg</div>
+                <div class="stat-value" id="plan-avg-cal">0</div>
+                <div class="stat-subtext">cal/day</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-label">Avg Protein</div>
+                <div class="stat-value success" id="plan-avg-protein">0</div>
+                <div class="stat-subtext">g/day</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-label">Weekly Deficit</div>
+                <div class="stat-value success" id="plan-total-deficit">0</div>
+                <div class="stat-subtext">calories</div>
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin-bottom: 30px;">
+            <button onclick="generateMealPlan()" style="padding: 15px 40px; background: linear-gradient(135deg, #00d4ff, #00ff88); border: none; border-radius: 12px; color: #0a0a0a; font-size: 16px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 12px rgba(0,212,255,0.3);">
+                Generate 7-Day Plan
+            </button>
+        </div>
+        
+        <div id="meal-plan-container">
+            <div class="empty-state">Click "Generate 7-Day Plan" to create your meal prep schedule</div>
+        </div>
+        
+        <div id="shopping-list-container" style="display: none; margin-top: 30px;">
+            <div class="section-title">Shopping List</div>
+            <div class="history-day" style="background: #1a1a1a; padding: 20px; border-radius: 16px;">
+                <ul id="shopping-list" style="list-style: none; padding: 0; display: grid; gap: 10px;">
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let chart = null;
+        let currentTab = 'dashboard';
+        
+        function switchTab(tab) {
+            // Update tab buttons
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.getElementById(tab + '-tab').classList.add('active');
+            
+            currentTab = tab;
+            
+            // Load data for the tab
+            if (tab === 'history') {
+                loadHistory();
+            } else if (tab === 'mealprep') {
+                // Don't auto-generate, let user click button
+            }
+        }
+        
+        async function generateMealPlan() {
+            const res = await fetch('/api/generate_meal_plan');
+            const planData = await res.json();
+            
+            displayMealPlan(planData);
+        }
+        
+        function displayMealPlan(planData) {
+            // Update stats
+            document.getElementById('plan-avg-cal').textContent = Math.round(planData.weekly_totals.avg_calories);
+            document.getElementById('plan-avg-protein').textContent = Math.round(planData.weekly_totals.avg_protein);
+            document.getElementById('plan-total-deficit').textContent = Math.round(planData.weekly_totals.total_deficit);
+            
+            // Display plan
+            const container = document.getElementById('meal-plan-container');
+            container.innerHTML = planData.plan.map(day => {
+                const mealsHTML = day.meals.map(meal => {
+                    return `
+                        <div class="meal-item">
+                            <div class="meal-info">
+                                <div class="meal-time">${meal.meal_type}</div>
+                                <div class="meal-name">${meal.description}</div>
+                                <div class="meal-macros">${meal.protein}g P • ${meal.carbs || 0}g C • ${meal.fat || 0}g F</div>
+                            </div>
+                            <div class="meal-calories">${meal.calories}</div>
+                        </div>
+                    `;
+                }).join('');
+                
+                const deficitBadge = day.totals.deficit > 0 
+                    ? `<span class="deficit-badge deficit">${day.totals.deficit} cal deficit 🔥</span>`
+                    : day.totals.deficit < 0
+                    ? `<span class="deficit-badge surplus">${Math.abs(day.totals.deficit)} cal over</span>`
+                    : `<span class="deficit-badge target">On target</span>`;
+                
+                return `
+                    <div class="plan-day">
+                        <div class="plan-day-header">
+                            <div class="plan-day-name">${day.day}</div>
+                            <div class="history-totals">
+                                <div class="history-total-item">
+                                    <span class="history-total-value">${day.totals.calories}</span> cal
+                                </div>
+                                <div class="history-total-item">
+                                    <span class="history-total-value">${day.totals.protein}</span>g P
+                                </div>
+                                ${deficitBadge}
+                            </div>
+                        </div>
+                        ${mealsHTML}
+                    </div>
+                `;
+            }).join('');
+            
+            // Display shopping list
+            const shoppingContainer = document.getElementById('shopping-list-container');
+            const shoppingList = document.getElementById('shopping-list');
+            
+            if (Object.keys(planData.shopping_list).length > 0) {
+                shoppingContainer.style.display = 'block';
+                shoppingList.innerHTML = Object.entries(planData.shopping_list).map(([item, count]) => {
+                    return `
+                        <li class="shopping-item">
+                            <span>${item}</span>
+                            <span style="color: #00d4ff; font-weight: 600;">×${count}</span>
+                        </li>
+                    `;
+                }).join('');
+            }
+        }
+        
+        async function loadDashboard() {
+            const todayRes = await fetch('/api/today');
+            const todayData = await todayRes.json();
+            
+            const weekRes = await fetch('/api/last_14_days');
+            const weekData = await weekRes.json();
+            
+            updateStats(todayData, weekData);
+            updateChart(weekData, todayData.goals.calories);
+            updateMeals(todayData);
+        }
+        
+        async function loadHistory() {
+            const res = await fetch('/api/meal_history');
+            const history = await res.json();
+            
+            const historyList = document.getElementById('history-list');
+            
+            if (history.length === 0) {
+                historyList.innerHTML = '<div class="empty-state">No meal history yet</div>';
+                return;
+            }
+            
+            historyList.innerHTML = history.map(day => {
+                const mealsHTML = day.meals.map(meal => {
+                    const time = new Date('2000-01-01 ' + meal.time).toLocaleTimeString('en-US', {
+                        hour: 'numeric',
+                        minute: '2-digit'
+                    });
+                    
+                    return `
+                        <div class="meal-item">
+                            <div class="meal-info">
+                                <div class="meal-time">${time}</div>
+                                <div class="meal-name">${meal.description}</div>
+                                <div class="meal-macros">${meal.protein}g P • ${meal.carbs || 0}g C • ${meal.fat || 0}g F</div>
+                            </div>
+                            <div class="meal-calories">${meal.calories}</div>
+                        </div>
+                    `;
+                }).join('');
+                
+                return `
+                    <div class="history-day">
+                        <div class="history-day-header">
+                            <div class="history-date">${day.formatted_date}</div>
+                            <div class="history-totals">
+                                <div class="history-total-item">
+                                    <span class="history-total-value">${day.totals.calories}</span> cal
+                                </div>
+                                <div class="history-total-item">
+                                    <span class="history-total-value">${day.totals.protein}</span>g P
+                                </div>
+                            </div>
+                        </div>
+                        ${mealsHTML}
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function updateStats(today, week) {
+            const date = new Date(today.date);
+            document.getElementById('current-date').textContent = 
+                date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+            
+            const todayCal = today.totals.calories;
+            const calGoal = today.goals.calories;
+            const deficit = calGoal - todayCal;
+            
+            const todayEl = document.getElementById('today-cal');
+            todayEl.textContent = todayCal;
+            todayEl.className = 'stat-value ' + (todayCal <= calGoal ? 'success' : 'danger');
+            
+            document.getElementById('cal-goal').textContent = calGoal;
+            
+            const deficitEl = document.getElementById('today-deficit');
+            if (deficit > 0) {
+                deficitEl.textContent = '-' + deficit;
+                deficitEl.className = 'stat-value success';
+                document.getElementById('deficit-label').textContent = 'deficit 🔥';
+            } else if (deficit < 0) {
+                deficitEl.textContent = '+' + Math.abs(deficit);
+                deficitEl.className = 'stat-value danger';
+                document.getElementById('deficit-label').textContent = 'surplus';
+            } else {
+                deficitEl.textContent = '0';
+                deficitEl.className = 'stat-value';
+                document.getElementById('deficit-label').textContent = 'perfect!';
+            }
+            
+            const last7 = week.slice(-7);
+            const avgCal = Math.round(last7.reduce((sum, d) => sum + d.calories, 0) / last7.length);
+            const avgEl = document.getElementById('week-avg');
+            avgEl.textContent = avgCal;
+            avgEl.className = 'stat-value ' + (avgCal <= calGoal ? 'success' : 'warning');
+            
+            const proteinEl = document.getElementById('protein-today');
+            proteinEl.textContent = today.totals.protein;
+            proteinEl.className = 'stat-value ' + (today.totals.protein >= today.goals.protein ? 'success' : 'warning');
+            document.getElementById('protein-goal').textContent = today.goals.protein;
+            
+            const badge = document.getElementById('day-badge');
+            if (deficit > 100) {
+                badge.textContent = `${deficit} cal deficit 🔥`;
+                badge.className = 'deficit-badge deficit';
+            } else if (deficit < -100) {
+                badge.textContent = `${Math.abs(deficit)} cal over`;
+                badge.className = 'deficit-badge surplus';
+            } else {
+                badge.textContent = 'On target';
+                badge.className = 'deficit-badge target';
+            }
+        }
+        
+        function updateChart(data, target) {
+            const ctx = document.getElementById('calorieChart').getContext('2d');
+            
+            if (chart) {
+                chart.destroy();
+            }
+            
+            const labels = data.map(d => {
+                const date = new Date(d.date);
+                return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            });
+            
+            const calories = data.map(d => d.calories);
+            const targetLine = data.map(() => target);
+            
+            chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Calories',
+                            data: calories,
+                            borderColor: '#00d4ff',
+                            backgroundColor: 'rgba(0, 212, 255, 0.1)',
+                            borderWidth: 3,
+                            tension: 0.3,
+                            fill: true,
+                            pointRadius: 4,
+                            pointBackgroundColor: calories.map(c => c <= target ? '#00ff88' : '#ff4444'),
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2
+                        },
+                        {
+                            label: 'Target',
+                            data: targetLine,
+                            borderColor: '#666',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            fill: false,
+                            pointRadius: 0
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    aspectRatio: 2,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            labels: {
+                                color: '#888',
+                                font: { size: 12 }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: '#1a1a1a',
+                            titleColor: '#fff',
+                            bodyColor: '#fff',
+                            borderColor: '#333',
+                            borderWidth: 1,
+                            callbacks: {
+                                label: function(context) {
+                                    if (context.datasetIndex === 0) {
+                                        const value = context.parsed.y;
+                                        const diff = value - target;
+                                        const status = diff <= 0 ? `${Math.abs(diff)} under` : `${diff} over`;
+                                        return `${value} cal (${status})`;
+                                    }
+                                    return `Target: ${context.parsed.y} cal`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            grid: {
+                                color: '#222'
+                            },
+                            ticks: {
+                                color: '#666',
+                                callback: function(value) {
+                                    return value + ' cal';
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: '#666'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function updateMeals(today) {
+            const mealsList = document.getElementById('meals-list');
+            
+            if (today.meals.length === 0) {
+                mealsList.innerHTML = '<div class="empty-state">No meals logged yet today</div>';
+            } else {
+                mealsList.innerHTML = today.meals.map(meal => {
+                    const time = new Date('2000-01-01 ' + meal.time).toLocaleTimeString('en-US', {
+                        hour: 'numeric',
+                        minute: '2-digit'
+                    });
+                    
+                    return `
+                        <div class="meal-item">
+                            <div class="meal-info">
+                                <div class="meal-time">${time}</div>
+                                <div class="meal-name">${meal.description}</div>
+                                <div class="meal-macros">${meal.protein}g P • ${meal.carbs || 0}g C • ${meal.fat || 0}g F</div>
+                            </div>
+                            <div class="meal-calories">${meal.calories}</div>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+        
+        // Load dashboard data on page load
+        loadDashboard();
+        
+        // Refresh every 30 seconds if on dashboard
+        setInterval(() => {
+            if (currentTab === 'dashboard') {
+                loadDashboard();
+            }
+        }, 30000);
+    </script>
+</body>
+</html>

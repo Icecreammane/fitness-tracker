@@ -1,0 +1,226 @@
+<!-- Referral System Modal -->
+<style>
+.referral-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 4000;
+}
+
+.referral-modal.show {
+    display: flex;
+}
+
+.referral-content {
+    background: #1a1a1a;
+    border-radius: 20px;
+    padding: 30px;
+    max-width: 500px;
+    width: 90%;
+}
+
+.referral-title {
+    font-size: 24px;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.referral-subtitle {
+    text-align: center;
+    color: #888;
+    margin-bottom: 30px;
+}
+
+.referral-reward {
+    background: linear-gradient(135deg, #00d4ff, #00ff88);
+    border-radius: 16px;
+    padding: 20px;
+    text-align: center;
+    color: #0a0a0a;
+    margin-bottom: 20px;
+}
+
+.referral-reward-title {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.referral-reward-value {
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.referral-code-box {
+    background: #0a0a0a;
+    border: 2px solid #2a2a2a;
+    border-radius: 12px;
+    padding: 16px;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.referral-code {
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: #00ff88;
+    margin-bottom: 10px;
+}
+
+.referral-copy-btn {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #00d4ff, #00ff88);
+    color: #0a0a0a;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.referral-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.referral-stat {
+    background: #0a0a0a;
+    border-radius: 12px;
+    padding: 16px;
+    text-align: center;
+}
+
+.referral-stat-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: #00ff88;
+}
+
+.referral-stat-label {
+    font-size: 12px;
+    color: #666;
+    margin-top: 4px;
+}
+
+.referral-close {
+    width: 100%;
+    padding: 14px;
+    background: #2a2a2a;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+</style>
+
+<div class="referral-modal" id="referralModal">
+    <div class="referral-content">
+        <div class="referral-title">Invite Friends</div>
+        <div class="referral-subtitle">Give 1 month Pro, get 1 month Pro</div>
+        
+        <div class="referral-reward">
+            <div class="referral-reward-title">Your Reward</div>
+            <div class="referral-reward-value">30 Days Pro</div>
+            <div>For each friend who signs up</div>
+        </div>
+        
+        <div class="referral-code-box">
+            <div class="referral-code" id="referralCode">LOADING...</div>
+            <button class="referral-copy-btn" onclick="copyReferralCode()">
+                📋 Copy Link
+            </button>
+        </div>
+        
+        <div class="referral-stats">
+            <div class="referral-stat">
+                <div class="referral-stat-value" id="totalReferrals">0</div>
+                <div class="referral-stat-label">Referrals</div>
+            </div>
+            <div class="referral-stat">
+                <div class="referral-stat-value" id="totalRewards">0</div>
+                <div class="referral-stat-label">Days Earned</div>
+            </div>
+        </div>
+        
+        <button class="referral-close" onclick="closeReferralModal()">Close</button>
+    </div>
+</div>
+
+<script>
+let currentReferralCode = null;
+
+async function openReferralModal() {
+    document.getElementById('referralModal').classList.add('show');
+    await loadReferralData();
+}
+
+function closeReferralModal() {
+    document.getElementById('referralModal').classList.remove('show');
+}
+
+async function loadReferralData() {
+    try {
+        // Generate code if needed
+        const generateRes = await fetch('/api/referral/generate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user_id: 'default' })
+        });
+        const generateData = await generateRes.json();
+        
+        currentReferralCode = generateData.code;
+        document.getElementById('referralCode').textContent = generateData.code;
+        
+        // Load stats
+        const statsRes = await fetch('/api/referral/stats?user_id=default');
+        const statsData = await statsRes.json();
+        
+        document.getElementById('totalReferrals').textContent = statsData.total_referrals;
+        document.getElementById('totalRewards').textContent = statsData.total_rewards_days;
+        
+    } catch (err) {
+        console.error('Failed to load referral data:', err);
+    }
+}
+
+async function copyReferralCode() {
+    const url = `https://lean.app?ref=${currentReferralCode}`;
+    
+    try {
+        await navigator.clipboard.writeText(url);
+        alert('✅ Link copied!');
+    } catch (err) {
+        // Fallback
+        const textarea = document.createElement('textarea');
+        textarea.value = url;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        alert('✅ Link copied!');
+    }
+}
+
+// Track analytics events
+function trackEvent(event, properties = {}) {
+    fetch('/api/analytics/event', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ event, properties })
+    }).catch(err => console.error('Analytics error:', err));
+}
+
+// Track page load
+trackEvent('page_view', { page: 'dashboard' });
+</script>

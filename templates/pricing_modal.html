@@ -1,0 +1,234 @@
+<!-- Pricing/Upgrade Modal -->
+<style>
+.pricing-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 5000;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+.pricing-modal.show {
+    display: flex;
+}
+
+.pricing-content {
+    background: #1a1a1a;
+    border-radius: 20px;
+    padding: 30px;
+    max-width: 600px;
+    width: 100%;
+}
+
+.pricing-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.pricing-title {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.pricing-subtitle {
+    color: #888;
+    font-size: 14px;
+}
+
+.pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.pricing-card {
+    background: #0a0a0a;
+    border: 2px solid #2a2a2a;
+    border-radius: 16px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.pricing-card:hover {
+    border-color: #00d4ff;
+    transform: translateY(-2px);
+}
+
+.pricing-card.featured {
+    border-color: #00ff88;
+    background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(0, 255, 136, 0.1));
+}
+
+.pricing-badge {
+    background: linear-gradient(135deg, #00d4ff, #00ff88);
+    color: #0a0a0a;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 12px;
+    display: inline-block;
+    margin-bottom: 10px;
+}
+
+.pricing-plan-name {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.pricing-price {
+    font-size: 32px;
+    font-weight: 700;
+    color: #00ff88;
+    margin-bottom: 5px;
+}
+
+.pricing-period {
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 15px;
+}
+
+.pricing-features {
+    text-align: left;
+    margin-bottom: 15px;
+}
+
+.pricing-feature {
+    font-size: 12px;
+    color: #aaa;
+    margin: 8px 0;
+}
+
+.pricing-feature::before {
+    content: "✓ ";
+    color: #00ff88;
+    font-weight: 700;
+}
+
+.pricing-btn {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #00d4ff, #00ff88);
+    color: #0a0a0a;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.pricing-btn.free {
+    background: #2a2a2a;
+    color: #fff;
+}
+
+.pricing-close {
+    width: 100%;
+    padding: 14px;
+    background: #2a2a2a;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 20px;
+}
+</style>
+
+<div class="pricing-modal" id="pricingModal">
+    <div class="pricing-content">
+        <div class="pricing-header">
+            <div class="pricing-title">Upgrade to Pro</div>
+            <div class="pricing-subtitle">Unlimited tracking, advanced features</div>
+        </div>
+        
+        <div class="pricing-grid">
+            <div class="pricing-card">
+                <div class="pricing-plan-name">Free</div>
+                <div class="pricing-price">$0</div>
+                <div class="pricing-period">forever</div>
+                <div class="pricing-features">
+                    <div class="pricing-feature">50 meals/month</div>
+                    <div class="pricing-feature">Basic tracking</div>
+                    <div class="pricing-feature">Progress photos</div>
+                </div>
+                <button class="pricing-btn free" onclick="closePricingModal()">Current Plan</button>
+            </div>
+            
+            <div class="pricing-card featured">
+                <div class="pricing-badge">Most Popular</div>
+                <div class="pricing-plan-name">Pro</div>
+                <div class="pricing-price">$4.99</div>
+                <div class="pricing-period">per month</div>
+                <div class="pricing-features">
+                    <div class="pricing-feature">Unlimited meals</div>
+                    <div class="pricing-feature">Meal prep plans</div>
+                    <div class="pricing-feature">Advanced analytics</div>
+                    <div class="pricing-feature">Export data</div>
+                </div>
+                <button class="pricing-btn" onclick="upgradeToPlan('pro')">Upgrade Now</button>
+            </div>
+            
+            <div class="pricing-card">
+                <div class="pricing-badge">Best Value</div>
+                <div class="pricing-plan-name">Lifetime</div>
+                <div class="pricing-price">$49</div>
+                <div class="pricing-period">one-time</div>
+                <div class="pricing-features">
+                    <div class="pricing-feature">All Pro features</div>
+                    <div class="pricing-feature">Lifetime access</div>
+                    <div class="pricing-feature">Priority support</div>
+                    <div class="pricing-feature">Early features</div>
+                </div>
+                <button class="pricing-btn" onclick="upgradeToPlan('lifetime')">Get Lifetime</button>
+            </div>
+        </div>
+        
+        <button class="pricing-close" onclick="closePricingModal()">Maybe Later</button>
+    </div>
+</div>
+
+<script>
+function openPricingModal() {
+    document.getElementById('pricingModal').classList.add('show');
+    trackEvent('viewed_pricing');
+}
+
+function closePricingModal() {
+    document.getElementById('pricingModal').classList.remove('show');
+}
+
+async function upgradeToPlan(plan) {
+    try {
+        trackEvent('clicked_upgrade', { plan });
+        
+        const res = await fetch('/api/stripe/create-checkout', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ plan })
+        });
+        
+        const data = await res.json();
+        
+        if (data.success) {
+            // In production, redirect to real Stripe checkout
+            alert(`🚀 Redirecting to checkout for ${plan} plan...`);
+            // window.location.href = data.checkout_url;
+        }
+    } catch (err) {
+        alert('Failed to start checkout. Please try again.');
+    }
+}
+</script>

@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lean - Smart Calorie Tracking</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 600px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 56px;
+            font-weight: 800;
+            margin-bottom: 16px;
+            line-height: 1.2;
+        }
+        
+        .tagline {
+            font-size: 24px;
+            opacity: 0.95;
+            margin-bottom: 32px;
+        }
+        
+        .features {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 32px;
+            margin: 32px 0;
+            text-align: left;
+        }
+        
+        .feature {
+            margin: 16px 0;
+            font-size: 18px;
+        }
+        
+        .feature-icon {
+            margin-right: 12px;
+        }
+        
+        .email-form {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            margin: 32px 0;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        
+        .email-form h2 {
+            color: #1a1a1a;
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+        
+        .email-form p {
+            color: #666;
+            margin-bottom: 24px;
+        }
+        
+        .form-group {
+            margin-bottom: 16px;
+        }
+        
+        input {
+            width: 100%;
+            padding: 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.2s;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .success-message {
+            display: none;
+            background: #4CAF50;
+            color: white;
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 16px;
+        }
+        
+        .social-proof {
+            margin-top: 32px;
+            font-size: 16px;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🥗 Lean</h1>
+        <p class="tagline">Track calories in seconds. Hit your goals effortlessly.</p>
+        
+        <div class="features">
+            <div class="feature">
+                <span class="feature-icon">🎤</span> Voice logging - just say what you ate
+            </div>
+            <div class="feature">
+                <span class="feature-icon">📸</span> Photo tracking - snap and done
+            </div>
+            <div class="feature">
+                <span class="feature-icon">🎯</span> Goal projection - see when you'll hit your target
+            </div>
+            <div class="feature">
+                <span class="feature-icon">📊</span> Simple analytics - no BS, just results
+            </div>
+        </div>
+        
+        <div class="email-form">
+            <h2>Get Early Access</h2>
+            <p>Join the waitlist and be first to know when we launch.</p>
+            
+            <form id="emailForm" onsubmit="submitEmail(event)">
+                <div class="form-group">
+                    <input 
+                        type="text" 
+                        id="name" 
+                        placeholder="Your name" 
+                        required
+                    >
+                </div>
+                <div class="form-group">
+                    <input 
+                        type="email" 
+                        id="email" 
+                        placeholder="your@email.com" 
+                        required
+                    >
+                </div>
+                <button type="submit" class="btn" id="submitBtn">
+                    Get Early Access
+                </button>
+            </form>
+            
+            <div class="success-message" id="successMessage">
+                🎉 You're in! Check your email for next steps.
+            </div>
+        </div>
+        
+        <div class="social-proof">
+            ⚡️ Join 1,000+ people losing weight with Lean
+        </div>
+    </div>
+    
+    <script>
+        async function submitEmail(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const submitBtn = document.getElementById('submitBtn');
+            
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Submitting...';
+            
+            try {
+                const response = await fetch('/api/email/subscribe', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        name: name,
+                        email: email,
+                        source: 'landing'
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    document.getElementById('emailForm').style.display = 'none';
+                    document.getElementById('successMessage').style.display = 'block';
+                    
+                    // Track with analytics (if PostHog is configured)
+                    if (window.posthog) {
+                        posthog.capture('email_captured', {
+                            source: 'landing',
+                            email: email
+                        });
+                    }
+                } else {
+                    alert('Something went wrong. Please try again.');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Get Early Access';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Something went wrong. Please try again.');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Get Early Access';
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lean - Smart Calorie Tracking</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #0a0a0a;
+            color: #fff;
+            padding: 15px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            margin-bottom: 20px;
+        }
+        
+        .date {
+            font-size: 13px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        h1 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-top: 5px;
+            background: linear-gradient(135deg, #00d4ff, #00ff88);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .goal-banner {
+            background: linear-gradient(135deg, #00d4ff, #00ff88);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            color: #0a0a0a;
+        }
+        
+        .goal-status {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        
+        .goal-details {
+            display: flex;
+            gap: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            flex-wrap: wrap;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+        }
+        
+        .stat-label {
+            font-size: 11px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+        }
+        
+        .stat-value {
+            font-size: 26px;
+            font-weight: 700;
+        }
+        
+        .stat-value.success { color: #00ff88; }
+        .stat-value.warning { color: #ffaa00; }
+        .stat-value.danger { color: #ff4444; }
+        
+        .stat-subtext {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #1a1a1a;
+            overflow-x: auto;
+        }
+        
+        .tab {
+            padding: 10px 16px;
+            background: transparent;
+            border: none;
+            color: #666;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            white-space: nowrap;
+        }
+        
+        .tab.active {
+            color: #00d4ff;
+            border-bottom-color: #00d4ff;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .chart-container {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin: 20px 0 12px 0;
+        }
+        
+        .meals-list {
+            display: grid;
+            gap: 10px;
+        }
+        
+        .meal-item {
+            background: #1a1a1a;
+            border-radius: 10px;
+            padding: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .meal-info {
+            flex: 1;
+        }
+        
+        .meal-time {
+            font-size: 11px;
+            color: #666;
+            margin-bottom: 3px;
+        }
+        
+        .meal-name {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+        
+        .meal-macros {
+            font-size: 12px;
+            color: #888;
+        }
+        
+        .meal-calories {
+            font-size: 18px;
+            font-weight: 700;
+            color: #00d4ff;
+        }
+        
+        .progress-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 12px;
+        }
+        
+        .progress-photo-card {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 10px;
+            text-align: center;
+        }
+        
+        .progress-photo {
+            width: 100%;
+            aspect-ratio: 3/4;
+            background: #2a2a2a;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            color: #666;
+        }
+        
+        .progress-date {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 4px;
+        }
+        
+        .progress-weight {
+            font-size: 16px;
+            font-weight: 700;
+            color: #00d4ff;
+        }
+        
+        .upload-btn {
+            background: linear-gradient(135deg, #00d4ff, #00ff88);
+            border: none;
+            border-radius: 12px;
+            padding: 14px 24px;
+            color: #0a0a0a;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        
+        .ai-prediction-card {
+            background: linear-gradient(135deg, #6b46ff, #00d4ff);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            color: #fff;
+        }
+        
+        .ai-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+        
+        .ai-prediction {
+            font-size: 14px;
+            margin-bottom: 16px;
+            opacity: 0.9;
+        }
+        
+        .generate-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            border-radius: 8px;
+            padding: 10px 20px;
+            color: #fff;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="date" id="current-date">Loading...</div>
+        <h1>Fitness Tracker</h1>
+    </div>
+    
+    <!-- GOAL PROJECTION BANNER -->
+    <div class="goal-banner" id="goal-banner">
+        <div class="goal-status" id="goal-status">Loading...</div>
+        <div class="goal-details">
+            <span id="weight-progress">-- lbs lost</span>
+            <span id="days-to-goal">-- days to goal</span>
+            <span id="deficit-banked">-- cal banked</span>
+        </div>
+    </div>
+    
+    <!-- STATS CARDS -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-label">Streak</div>
+            <div class="stat-value success" id="streak">0🔥</div>
+            <div class="stat-subtext">days</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-label">Today</div>
+            <div class="stat-value" id="today-cal">0</div>
+            <div class="stat-subtext">/ <span id="cal-goal">2200</span></div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-label">Deficit</div>
+            <div class="stat-value" id="today-deficit">0</div>
+            <div class="stat-subtext">cal</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-label">Protein</div>
+            <div class="stat-value" id="protein-today">0</div>
+            <div class="stat-subtext">/ <span id="protein-goal">200</span>g</div>
+        </div>
+    </div>
+    
+    <!-- TABS -->
+    <div class="tabs">
+        <button class="tab active" onclick="switchTab('dashboard')">Dashboard</button>
+        <button class="tab" onclick="switchTab('progress')">Progress</button>
+        <button class="tab" onclick="switchTab('mealprep')">Meal Prep</button>
+        <button class="tab" onclick="switchTab('history')">History</button>
+    </div>
+    
+    <!-- DASHBOARD TAB -->
+    <div id="dashboard-tab" class="tab-content active">
+        <div class="chart-container">
+            <canvas id="calorieChart"></canvas>
+        </div>
+        
+        <div class="section-title">Today's Meals</div>
+        <div class="meals-list" id="meals-list">
+            <div class="empty-state">Loading...</div>
+        </div>
+    </div>
+    
+    <!-- PROGRESS TAB -->
+    <div id="progress-tab" class="tab-content">
+        <div class="ai-prediction-card">
+            <div class="ai-title">AI Body Prediction</div>
+            <div class="ai-prediction" id="ai-prediction">
+                At your current pace, you'll lose <strong id="projected-loss">0 lbs</strong> in the next 12 weeks
+            </div>
+            <button class="generate-btn" onclick="generateFutureBody()">Generate Prediction 🔮</button>
+        </div>
+        
+        <button class="upload-btn" onclick="uploadProgressPhoto()">📸 Upload Progress Photo</button>
+        
+        <div class="section-title">Progress Photos</div>
+        <div class="progress-grid" id="progress-photos">
+            <div class="empty-state">No photos yet - upload your first!</div>
+        </div>
+    </div>
+    
+    <!-- MEAL PREP TAB -->
+    <div id="mealprep-tab" class="tab-content">
+        <div class="empty-state">Meal prep features coming soon...</div>
+    </div>
+    
+    <!-- HISTORY TAB -->
+    <div id="history-tab" class="tab-content">
+        <div class="empty-state">History loading...</div>
+    </div>
+    
+    <script>
+        let chart = null;
+        let currentTab = 'dashboard';
+        
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.getElementById(tab + '-tab').classList.add('active');
+            
+            currentTab = tab;
+            
+            if (tab === 'progress') {
+                loadProgressPhotos();
+            }
+        }
+        
+        async function loadAll() {
+            await Promise.all([
+                loadToday(),
+                loadGoalProjection(),
+                loadTrendChart()
+            ]);
+        }
+        
+        async function loadToday() {
+            const res = await fetch('/api/today');
+            const today = await res.json();
+            
+            document.getElementById('current-date').textContent = 
+                new Date(today.date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+            
+            const todayCal = today.totals.calories;
+            const calGoal = today.goals.calories;
+            const deficit = calGoal - todayCal;
+            
+            document.getElementById('today-cal').textContent = todayCal;
+            document.getElementById('cal-goal').textContent = calGoal;
+            document.getElementById('protein-today').textContent = today.totals.protein;
+            document.getElementById('protein-goal').textContent = today.goals.protein;
+            
+            const deficitEl = document.getElementById('today-deficit');
+            deficitEl.textContent = deficit > 0 ? `-${deficit}` : `+${Math.abs(deficit)}`;
+            deficitEl.className = 'stat-value ' + (deficit > 0 ? 'success' : 'danger');
+            
+            // Update meals
+            const mealsList = document.getElementById('meals-list');
+            if (today.meals.length === 0) {
+                mealsList.innerHTML = '<div class="empty-state">No meals logged today</div>';
+            } else {
+                mealsList.innerHTML = today.meals.map(meal => {
+                    const time = new Date('2000-01-01 ' + meal.time).toLocaleTimeString('en-US', {
+                        hour: 'numeric',
+                        minute: '2-digit'
+                    });
+                    
+                    return `
+                        <div class="meal-item">
+                            <div class="meal-info">
+                                <div class="meal-time">${time}</div>
+                                <div class="meal-name">${meal.description}</div>
+                                <div class="meal-macros">${meal.protein}g P • ${meal.carbs || 0}g C • ${meal.fat || 0}g F</div>
+                            </div>
+                            <div class="meal-calories">${meal.calories}</div>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+        
+        async function loadGoalProjection() {
+            const res = await fetch('/api/goal_projection');
+            const proj = await res.json();
+            
+            if (proj.error) {
+                document.getElementById('goal-status').textContent = 'Set your goals to see projection';
+                return;
+            }
+            
+            document.getElementById('goal-status').textContent = 
+                `${proj.goal_weight} lbs by ${new Date(proj.target_date).toLocaleDateString('en-US', {month: 'short', day: 'numeric'})} ${proj.status_text}`;
+            
+            document.getElementById('weight-progress').textContent = 
+                `${proj.lbs_lost} lbs lost`;
+            
+            document.getElementById('days-to-goal').textContent = 
+                `${proj.days_to_goal} days to goal`;
+            
+            document.getElementById('deficit-banked').textContent = 
+                `${proj.total_deficit.toLocaleString()} cal banked 🔥`;
+            
+            document.getElementById('streak').textContent = 
+                `${proj.current_streak}🔥`;
+            
+            // Update AI prediction
+            const projectedLoss = (proj.actual_weekly_loss * 12).toFixed(1);
+            document.getElementById('projected-loss').textContent = `${projectedLoss} lbs`;
+        }
+        
+        async function loadTrendChart() {
+            const res = await fetch('/api/last_14_days');
+            const data = await res.json();
+            
+            const ctx = document.getElementById('calorieChart').getContext('2d');
+            
+            if (chart) chart.destroy();
+            
+            const labels = data.map(d => new Date(d.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+            const calories = data.map(d => d.calories);
+            const targetLine = data.map(() => 2200);
+            
+            chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Calories',
+                            data: calories,
+                            borderColor: '#00d4ff',
+                            backgroundColor: 'rgba(0, 212, 255, 0.1)',
+                            borderWidth: 3,
+                            tension: 0.3,
+                            fill: true,
+                            pointRadius: 4,
+                            pointBackgroundColor: calories.map(c => c <= 2200 ? '#00ff88' : '#ff4444'),
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2
+                        },
+                        {
+                            label: 'Target',
+                            data: targetLine,
+                            borderColor: '#666',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            fill: false,
+                            pointRadius: 0
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    aspectRatio: 2.2,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            grid: { color: '#222' },
+                            ticks: { color: '#666' }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#666' }
+                        }
+                    }
+                }
+            });
+        }
+        
+        async function loadProgressPhotos() {
+            const res = await fetch('/api/progress_photos');
+            const photos = await res.json();
+            
+            const grid = document.getElementById('progress-photos');
+            
+            if (photos.length === 0) {
+                grid.innerHTML = '<div class="empty-state">No photos yet - upload your first!</div>';
+                return;
+            }
+            
+            grid.innerHTML = photos.map(photo => `
+                <div class="progress-photo-card">
+                    <div class="progress-photo">📸</div>
+                    <div class="progress-date">${new Date(photo.date).toLocaleDateString()}</div>
+                    <div class="progress-weight">${photo.weight} lbs</div>
+                </div>
+            `).join('');
+        }
+        
+        function uploadProgressPhoto() {
+            alert('Progress photo upload coming soon! For now, track your photos manually.');
+        }
+        
+        async function generateFutureBody() {
+            const res = await fetch('/api/generate_future_body', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ weeks_ahead: 12 })
+            });
+            
+            const result = await res.json();
+            
+            if (result.error) {
+                alert(result.error);
+                return;
+            }
+            
+            alert(`AI Prediction:\n\nIn 12 weeks at your current pace:\n• Weight: ${result.projected_weight} lbs\n• Loss: ${result.projected_weight_loss} lbs\n\nConfidence: ${result.confidence}\n\n(Visual generation coming soon!)`);
+        }
+        
+        loadAll();
+        setInterval(() => {
+            if (currentTab === 'dashboard') loadAll();
+        }, 60000);
+    </script>
+    
+    <!-- Voice Logging Component -->
+    {% include 'voice_button.html' %}
+    
+    <!-- Lean Goal Calculator -->
+    {% include 'lean_calculator.html' %}
+</body>
+</html>

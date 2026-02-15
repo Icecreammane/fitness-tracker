@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trial Ended - FitTrack Pro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --accent: #f59e0b;
+            --text: #0f172a;
+            --text-secondary: #64748b;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Roboto, sans-serif;
+            background: #f8fafc;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .expired-card {
+            background: white;
+            padding: 60px 48px;
+            border-radius: 24px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 600px;
+            border: 2px solid #e2e8f0;
+        }
+        
+        .icon-container {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 32px;
+            background: linear-gradient(135deg, var(--accent), #ea580c);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 24px rgba(245, 158, 11, 0.3);
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 8px 24px rgba(245, 158, 11, 0.3);
+            }
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 8px 32px rgba(245, 158, 11, 0.5);
+            }
+        }
+        
+        .icon {
+            font-size: 4rem;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 16px;
+            color: var(--text);
+            font-weight: 800;
+        }
+        
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            margin-bottom: 40px;
+            line-height: 1.7;
+        }
+        
+        .value-prop {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            border-left: 4px solid var(--accent);
+            padding: 28px;
+            border-radius: 16px;
+            margin: 32px 0;
+            text-align: left;
+        }
+        
+        .value-prop-title {
+            font-weight: 800;
+            color: #92400e;
+            margin-bottom: 16px;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .value-list {
+            list-style: none;
+            color: #78350f;
+        }
+        
+        .value-list li {
+            padding: 10px 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            line-height: 1.6;
+        }
+        
+        .value-list li::before {
+            content: "✓";
+            color: var(--accent);
+            font-weight: 800;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+        
+        .price-highlight {
+            background: #f8fafc;
+            padding: 24px;
+            border-radius: 16px;
+            margin: 32px 0;
+            border: 2px dashed var(--primary);
+        }
+        
+        .price-text {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+        
+        .price {
+            font-size: 3.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1;
+        }
+        
+        .price-period {
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+        
+        .cta-button {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            border: none;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.5);
+        }
+        
+        .guarantee {
+            margin-top: 20px;
+            padding: 16px;
+            background: #f0fdf4;
+            border-radius: 12px;
+            color: #166534;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .logout-section {
+            margin-top: 40px;
+            padding-top: 32px;
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        .logout-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: color 0.2s;
+        }
+        
+        .logout-link:hover {
+            color: var(--primary);
+            text-decoration: underline;
+        }
+        
+        @media (max-width: 480px) {
+            .expired-card {
+                padding: 40px 24px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .icon-container {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .icon {
+                font-size: 3rem;
+            }
+            
+            .price {
+                font-size: 3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="expired-card">
+        <div class="icon-container">
+            <div class="icon">⏰</div>
+        </div>
+        
+        <h1>Your Trial Has Ended</h1>
+        <p class="subtitle">
+            Thanks for trying FitTrack Pro! Your 7-day free trial has expired.<br>
+            Subscribe now to keep tracking your fitness journey.
+        </p>
+        
+        <div class="value-prop">
+            <div class="value-prop-title">
+                <span>💪</span>
+                <span>What you'll keep with a subscription:</span>
+            </div>
+            <ul class="value-list">
+                <li><strong>All your logged data</strong> - meals, workouts, weight history</li>
+                <li><strong>Unlimited macro tracking</strong> - hit your goals daily</li>
+                <li><strong>Workout logging</strong> - track progressive overload</li>
+                <li><strong>Progress charts</strong> - visualize your journey</li>
+                <li><strong>Mobile access</strong> - track anywhere, anytime</li>
+            </ul>
+        </div>
+        
+        <div class="price-highlight">
+            <p class="price-text">Continue for just</p>
+            <div>
+                <span class="price">$10</span>
+                <span class="price-period">/month</span>
+            </div>
+        </div>
+        
+        <button class="cta-button" onclick="subscribe()">
+            <span>Subscribe Now & Continue</span>
+            <span>→</span>
+        </button>
+        
+        <div class="guarantee">
+            <span>💯</span>
+            <span><strong>30-Day Money-Back Guarantee</strong> - Not satisfied? Get a full refund.</span>
+        </div>
+        
+        <div class="logout-section">
+            <a href="/logout" class="logout-link">← Logout</a>
+        </div>
+    </div>
+
+    <script>
+        async function subscribe() {
+            try {
+                const response = await fetch('/create-checkout-session', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.url) {
+                    window.location.href = data.url;
+                } else if (data.error) {
+                    alert('Error: ' + data.error);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Something went wrong. Please try again or contact support.');
+            }
+        }
+    </script>
+</body>
+</html>

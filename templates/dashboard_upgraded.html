@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fitness Tracker - Ross</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #10b981;
+            --accent: #f59e0b;
+            --bg: #0f172a;
+            --bg-card: #1e293b;
+            --text: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border: #334155;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .logo {
+            font-size: 1.75rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .date-display {
+            font-size: 1rem;
+            color: var(--text-secondary);
+        }
+        
+        /* Daily Summary Section */
+        .daily-summary {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        
+        .summary-header {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--text);
+        }
+        
+        .macro-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .macro-card {
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 12px;
+            padding: 16px;
+        }
+        
+        .macro-card.protein { background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.3); }
+        .macro-card.calories { background: rgba(99, 102, 241, 0.1); border-color: rgba(99, 102, 241, 0.3); }
+        .macro-card.carbs { background: rgba(245, 158, 11, 0.1); border-color: rgba(245, 158, 11, 0.3); }
+        .macro-card.fat { background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.3); }
+        
+        .macro-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+        
+        .macro-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        
+        .macro-goal {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--secondary), var(--primary));
+            transition: width 0.3s ease;
+        }
+        
+        .progress-fill.protein { background: var(--secondary); }
+        .progress-fill.calories { background: var(--primary); }
+        .progress-fill.carbs { background: var(--accent); }
+        .progress-fill.fat { background: var(--danger); }
+        
+        /* Quick Actions */
+        .quick-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+        
+        .btn-secondary {
+            background: var(--secondary);
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #059669;
+            transform: translateY(-1px);
+        }
+        
+        /* Meal Templates Section */
+        .templates-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+        
+        .templates-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+        }
+        
+        .template-card {
+            background: rgba(99, 102, 241, 0.05);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .template-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+        
+        .template-name {
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 4px;
+        }
+        
+        .template-description {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+        
+        .template-macros {
+            display: flex;
+            gap: 12px;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+        
+        .template-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 0.8rem;
+            border-radius: 6px;
+        }
+        
+        .btn-delete {
+            background: var(--danger);
+            color: white;
+        }
+        
+        /* Trends Section */
+        .trends-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        
+        .trend-controls {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .trend-btn {
+            padding: 8px 16px;
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .trend-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+        
+        .trend-btn:hover {
+            border-color: var(--primary);
+        }
+        
+        .trend-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .trend-stat {
+            text-align: center;
+        }
+        
+        .trend-stat-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+        
+        .trend-stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 500px;
+            width: 90%;
+        }
+        
+        .modal-header {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 24px;
+        }
+        
+        .form-group {
+            margin-bottom: 16px;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 1rem;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 24px;
+        }
+        
+        .btn-cancel {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+        
+        /* Meal History */
+        .history-day {
+            margin-bottom: 24px;
+        }
+        
+        .history-date {
+            font-size: 0.875rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .history-entry {
+            background: rgba(99, 102, 241, 0.05);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .history-entry.from-template {
+            border-left: 3px solid var(--secondary);
+        }
+        
+        .entry-left {
+            flex: 1;
+        }
+        
+        .entry-time {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+        
+        .entry-description {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .entry-notes {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+        
+        .entry-template-badge {
+            display: inline-block;
+            background: var(--secondary);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+        
+        .entry-right {
+            text-align: right;
+        }
+        
+        .entry-macros {
+            display: flex;
+            gap: 12px;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+        
+        .macro-item {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+        
+        .macro-item-value {
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--text);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">💪 FitTrack Pro</div>
+            <div class="date-display" id="dateDisplay"></div>
+        </div>
+        
+        <!-- Daily Summary -->
+        <div class="daily-summary">
+            <div class="summary-header">📊 Today's Progress</div>
+            <div class="macro-grid">
+                <div class="macro-card protein">
+                    <div class="macro-label">Protein</div>
+                    <div class="macro-value" id="proteinValue">0g</div>
+                    <div class="macro-goal" id="proteinGoal">Goal: 225g</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill protein" id="proteinProgress" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div class="macro-card calories">
+                    <div class="macro-label">Calories</div>
+                    <div class="macro-value" id="caloriesValue">0</div>
+                    <div class="macro-goal" id="caloriesGoal">Goal: 2150</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill calories" id="caloriesProgress" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div class="macro-card carbs">
+                    <div class="macro-label">Carbs</div>
+                    <div class="macro-value" id="carbsValue">0g</div>
+                    <div class="macro-goal" id="carbsGoal">Goal: 200g</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill carbs" id="carbsProgress" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div class="macro-card fat">
+                    <div class="macro-label">Fat</div>
+                    <div class="macro-value" id="fatValue">0g</div>
+                    <div class="macro-goal" id="fatGoal">Goal: 75g</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill fat" id="fatProgress" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="quick-actions">
+                <button class="btn btn-primary" onclick="openLogModal()">➕ Log Food</button>
+                <button class="btn btn-secondary" onclick="openTemplateModal()">💾 Save as Template</button>
+            </div>
+        </div>
+        
+        <!-- Meal Templates -->
+        <div class="templates-section">
+            <div class="section-header">
+                <div class="section-title">🍽️ Meal Templates</div>
+            </div>
+            <div class="templates-grid" id="templatesGrid">
+                <div style="text-align: center; padding: 40px; color: var(--text-secondary);">
+                    No templates yet. Log a meal and save it as a template!
+                </div>
+            </div>
+        </div>
+        
+        <!-- Weekly Trends -->
+        <div class="trends-section">
+            <div class="section-header">
+                <div class="section-title">📈 Weekly Trends</div>
+                <div class="trend-controls">
+                    <button class="trend-btn active" data-days="7" onclick="changeTrendPeriod(7)">7 Days</button>
+                    <button class="trend-btn" data-days="14" onclick="changeTrendPeriod(14)">14 Days</button>
+                    <button class="trend-btn" data-days="30" onclick="changeTrendPeriod(30)">30 Days</button>
+                </div>
+            </div>
+            <div class="trend-stats">
+                <div class="trend-stat">
+                    <div class="trend-stat-label">Avg Protein</div>
+                    <div class="trend-stat-value" id="avgProtein">0g</div>
+                </div>
+                <div class="trend-stat">
+                    <div class="trend-stat-label">Avg Calories</div>
+                    <div class="trend-stat-value" id="avgCalories">0</div>
+                </div>
+                <div class="trend-stat">
+                    <div class="trend-stat-label">Consistency</div>
+                    <div class="trend-stat-value" id="consistency">0%</div>
+                </div>
+                <div class="trend-stat">
+                    <div class="trend-stat-label">Days Hit Goal</div>
+                    <div class="trend-stat-value" id="daysHitGoal">0/7</div>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="trendsChart"></canvas>
+            </div>
+        </div>
+        
+        <!-- Meal History -->
+        <div class="trends-section">
+            <div class="section-header">
+                <div class="section-title">📝 Meal History</div>
+                <div style="font-size: 0.875rem; color: var(--text-secondary);" id="historyCount">0 meals logged</div>
+            </div>
+            <div id="mealHistory" style="max-height: 600px; overflow-y: auto;">
+                <div style="text-align: center; padding: 40px; color: var(--text-secondary);">Loading...</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Log Food Modal -->
+    <div class="modal" id="logModal">
+        <div class="modal-content">
+            <div class="modal-header">Log Food</div>
+            <div class="form-group">
+                <label class="form-label">Description</label>
+                <input type="text" class="form-input" id="foodDescription" placeholder="e.g., Chicken breast with rice">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Calories</label>
+                <input type="number" class="form-input" id="foodCalories" placeholder="500">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Protein (g)</label>
+                <input type="number" class="form-input" id="foodProtein" placeholder="45">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Carbs (g)</label>
+                <input type="number" class="form-input" id="foodCarbs" placeholder="60">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Fat (g)</label>
+                <input type="number" class="form-input" id="foodFat" placeholder="10">
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-cancel" onclick="closeLogModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="logFood()">Log Food</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Save Template Modal -->
+    <div class="modal" id="templateModal">
+        <div class="modal-content">
+            <div class="modal-header">Save Meal Template</div>
+            <div class="form-group">
+                <label class="form-label">Template Name</label>
+                <input type="text" class="form-input" id="templateName" placeholder="e.g., Morning Protein Shake">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Description</label>
+                <input type="text" class="form-input" id="templateDescription" placeholder="What's in it?">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Calories</label>
+                <input type="number" class="form-input" id="templateCalories" placeholder="500">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Protein (g)</label>
+                <input type="number" class="form-input" id="templateProtein" placeholder="45">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Carbs (g)</label>
+                <input type="number" class="form-input" id="templateCarbs" placeholder="60">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Fat (g)</label>
+                <input type="number" class="form-input" id="templateFat" placeholder="10">
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-cancel" onclick="closeTemplateModal()">Cancel</button>
+                <button class="btn btn-secondary" onclick="saveTemplate()">Save Template</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let trendsChart = null;
+        let currentTrendPeriod = 7;
+        
+        // Update date display
+        function updateDateDisplay() {
+            const now = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('dateDisplay').textContent = now.toLocaleDateString('en-US', options);
+        }
+        
+        // Load daily summary
+        async function loadDailySummary() {
+            try {
+                const response = await fetch('/api/daily-summary');
+                const data = await response.json();
+                
+                // Update values
+                document.getElementById('proteinValue').textContent = Math.round(data.totals.protein) + 'g';
+                document.getElementById('caloriesValue').textContent = Math.round(data.totals.calories);
+                document.getElementById('carbsValue').textContent = Math.round(data.totals.carbs) + 'g';
+                document.getElementById('fatValue').textContent = Math.round(data.totals.fat) + 'g';
+                
+                // Update goals
+                document.getElementById('proteinGoal').textContent = `Goal: ${data.goals.protein}g`;
+                document.getElementById('caloriesGoal').textContent = `Goal: ${data.goals.calories}`;
+                document.getElementById('carbsGoal').textContent = `Goal: ${data.goals.carbs}g`;
+                document.getElementById('fatGoal').textContent = `Goal: ${data.goals.fat}g`;
+                
+                // Update progress bars
+                document.getElementById('proteinProgress').style.width = data.progress.protein + '%';
+                document.getElementById('caloriesProgress').style.width = data.progress.calories + '%';
+                document.getElementById('carbsProgress').style.width = data.progress.carbs + '%';
+                document.getElementById('fatProgress').style.width = data.progress.fat + '%';
+            } catch (error) {
+                console.error('Failed to load daily summary:', error);
+            }
+        }
+        
+        // Load meal templates
+        async function loadTemplates() {
+            try {
+                const response = await fetch('/api/meal-templates');
+                const data = await response.json();
+                const grid = document.getElementById('templatesGrid');
+                
+                if (data.templates.length === 0) {
+                    grid.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--text-secondary);">No templates yet. Log a meal and save it as a template!</div>';
+                    return;
+                }
+                
+                grid.innerHTML = data.templates.map(template => `
+                    <div class="template-card">
+                        <div class="template-name">${template.name}</div>
+                        <div class="template-description">${template.description}</div>
+                        <div class="template-macros">
+                            <span>🔥 ${template.calories} cal</span>
+                            <span>💪 ${template.protein}g P</span>
+                        </div>
+                        <div class="template-actions">
+                            <button class="btn btn-primary btn-small" onclick="logFromTemplate(${template.id})">Log This</button>
+                            <button class="btn btn-delete btn-small" onclick="deleteTemplate(${template.id})">Delete</button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Failed to load templates:', error);
+            }
+        }
+        
+        // Load weekly trends
+        async function loadTrends(days = 7) {
+            try {
+                const response = await fetch(`/api/weekly-trends?days=${days}`);
+                const data = await response.json();
+                
+                // Update stats
+                document.getElementById('avgProtein').textContent = data.averages.protein + 'g';
+                document.getElementById('avgCalories').textContent = data.averages.calories;
+                document.getElementById('consistency').textContent = data.consistency + '%';
+                document.getElementById('daysHitGoal').textContent = `${data.days_hit_goal}/${data.total_days}`;
+                
+                // Update chart
+                const ctx = document.getElementById('trendsChart').getContext('2d');
+                
+                if (trendsChart) {
+                    trendsChart.destroy();
+                }
+                
+                trendsChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.trends.map(t => t.date_label),
+                        datasets: [
+                            {
+                                label: 'Protein (g)',
+                                data: data.trends.map(t => t.protein),
+                                borderColor: '#10b981',
+                                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                                tension: 0.4,
+                                fill: true
+                            },
+                            {
+                                label: 'Calories',
+                                data: data.trends.map(t => t.calories),
+                                borderColor: '#6366f1',
+                                backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                                tension: 0.4,
+                                fill: true
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                labels: {
+                                    color: '#f1f5f9'
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                ticks: { color: '#94a3b8' },
+                                grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                            },
+                            x: {
+                                ticks: { color: '#94a3b8' },
+                                grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Failed to load trends:', error);
+            }
+        }
+        
+        // Change trend period
+        function changeTrendPeriod(days) {
+            currentTrendPeriod = days;
+            document.querySelectorAll('.trend-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (parseInt(btn.dataset.days) === days) {
+                    btn.classList.add('active');
+                }
+            });
+            loadTrends(days);
+        }
+        
+        // Modal functions
+        function openLogModal() {
+            document.getElementById('logModal').classList.add('active');
+        }
+        
+        function closeLogModal() {
+            document.getElementById('logModal').classList.remove('active');
+        }
+        
+        function openTemplateModal() {
+            document.getElementById('templateModal').classList.add('active');
+        }
+        
+        function closeTemplateModal() {
+            document.getElementById('templateModal').classList.remove('active');
+        }
+        
+        // Log food
+        async function logFood() {
+            const data = {
+                description: document.getElementById('foodDescription').value,
+                calories: parseInt(document.getElementById('foodCalories').value) || 0,
+                protein: parseInt(document.getElementById('foodProtein').value) || 0,
+                carbs: parseInt(document.getElementById('foodCarbs').value) || 0,
+                fat: parseInt(document.getElementById('foodFat').value) || 0
+            };
+            
+            try {
+                await fetch('/api/log-food', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                closeLogModal();
+                loadDailySummary();
+                loadTrends(currentTrendPeriod);
+                loadMealHistory();
+                
+                // Clear form
+                document.getElementById('foodDescription').value = '';
+                document.getElementById('foodCalories').value = '';
+                document.getElementById('foodProtein').value = '';
+                document.getElementById('foodCarbs').value = '';
+                document.getElementById('foodFat').value = '';
+            } catch (error) {
+                console.error('Failed to log food:', error);
+                alert('Failed to log food');
+            }
+        }
+        
+        // Save template
+        async function saveTemplate() {
+            const data = {
+                name: document.getElementById('templateName').value,
+                description: document.getElementById('templateDescription').value,
+                calories: parseInt(document.getElementById('templateCalories').value) || 0,
+                protein: parseInt(document.getElementById('templateProtein').value) || 0,
+                carbs: parseInt(document.getElementById('templateCarbs').value) || 0,
+                fat: parseInt(document.getElementById('templateFat').value) || 0
+            };
+            
+            try {
+                await fetch('/api/meal-templates', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                closeTemplateModal();
+                loadTemplates();
+                
+                // Clear form
+                document.getElementById('templateName').value = '';
+                document.getElementById('templateDescription').value = '';
+                document.getElementById('templateCalories').value = '';
+                document.getElementById('templateProtein').value = '';
+                document.getElementById('templateCarbs').value = '';
+                document.getElementById('templateFat').value = '';
+            } catch (error) {
+                console.error('Failed to save template:', error);
+                alert('Failed to save template');
+            }
+        }
+        
+        // Log from template
+        async function logFromTemplate(templateId) {
+            try {
+                await fetch(`/api/log-from-template/${templateId}`, { method: 'POST' });
+                loadDailySummary();
+                loadTrends(currentTrendPeriod);
+                loadMealHistory();
+            } catch (error) {
+                console.error('Failed to log from template:', error);
+                alert('Failed to log meal');
+            }
+        }
+        
+        // Delete template
+        async function deleteTemplate(templateId) {
+            if (!confirm('Delete this template?')) return;
+            
+            try {
+                await fetch(`/api/meal-templates/${templateId}`, { method: 'DELETE' });
+                loadTemplates();
+            } catch (error) {
+                console.error('Failed to delete template:', error);
+                alert('Failed to delete template');
+            }
+        }
+        
+        // Load meal history
+        async function loadMealHistory() {
+            try {
+                const response = await fetch('/api/meal-history');
+                const data = await response.json();
+                const container = document.getElementById('mealHistory');
+                
+                document.getElementById('historyCount').textContent = `${data.total_entries} meals logged`;
+                
+                if (data.total_entries === 0) {
+                    container.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--text-secondary);">No meals logged yet</div>';
+                    return;
+                }
+                
+                // Render grouped by date
+                let html = '';
+                const dates = Object.keys(data.grouped).sort().reverse();
+                
+                dates.forEach(date => {
+                    const entries = data.grouped[date];
+                    const dateObj = new Date(date + 'T00:00:00');
+                    const dateLabel = dateObj.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+                    
+                    html += `<div class="history-day">`;
+                    html += `<div class="history-date">${dateLabel}</div>`;
+                    
+                    entries.forEach(entry => {
+                        const fromTemplate = entry.from_template ? ' from-template' : '';
+                        const templateBadge = entry.from_template ? `<span class="entry-template-badge">📋 ${entry.template_name}</span>` : '';
+                        const notes = entry.notes ? `<div class="entry-notes">${entry.notes}</div>` : '';
+                        
+                        html += `
+                            <div class="history-entry${fromTemplate}">
+                                <div class="entry-left">
+                                    <div class="entry-time">${entry.time}</div>
+                                    <div class="entry-description">${entry.description || 'Unknown food'}${templateBadge}</div>
+                                    ${notes}
+                                </div>
+                                <div class="entry-right">
+                                    <div class="entry-macros">
+                                        <div class="macro-item">
+                                            <div class="macro-item-value">${Math.round(entry.calories)}</div>
+                                            <div>cal</div>
+                                        </div>
+                                        <div class="macro-item">
+                                            <div class="macro-item-value">${Math.round(entry.protein)}g</div>
+                                            <div>protein</div>
+                                        </div>
+                                        <div class="macro-item">
+                                            <div class="macro-item-value">${Math.round(entry.carbs)}g</div>
+                                            <div>carbs</div>
+                                        </div>
+                                        <div class="macro-item">
+                                            <div class="macro-item-value">${Math.round(entry.fat)}g</div>
+                                            <div>fat</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    
+                    html += `</div>`;
+                });
+                
+                container.innerHTML = html;
+            } catch (error) {
+                console.error('Failed to load meal history:', error);
+            }
+        }
+        
+        // Initialize
+        updateDateDisplay();
+        loadDailySummary();
+        loadTemplates();
+        loadTrends(7);
+        loadMealHistory();
+        
+        // Auto-refresh daily summary every 30 seconds
+        setInterval(loadDailySummary, 30000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+{
+  "subscribers": [
+    {
+      "email": "test@example.com",
+      "name": "Test User",
+      "source": "test",
+      "subscribed_at": "2026-02-13T09:29:14.214049",
+      "metadata": {},
+      "drip_sequence_sent": []
+    }
+  ]
+}

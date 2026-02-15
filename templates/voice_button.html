@@ -1,0 +1,297 @@
+<!-- Voice Recording Button Component -->
+<style>
+.voice-button {
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff006e, #8338ec);
+    border: none;
+    box-shadow: 0 8px 24px rgba(255, 0, 110, 0.4);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    z-index: 1000;
+}
+
+.voice-button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 12px 32px rgba(255, 0, 110, 0.6);
+}
+
+.voice-button:active, .voice-button.recording {
+    background: linear-gradient(135deg, #ff4d4d, #ff0000);
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+}
+
+.voice-button svg {
+    width: 32px;
+    height: 32px;
+    fill: white;
+}
+
+.voice-confirm-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+}
+
+.voice-confirm-modal.show {
+    display: flex;
+}
+
+.voice-confirm-content {
+    background: #1a1a1a;
+    border-radius: 20px;
+    padding: 30px;
+    max-width: 400px;
+    width: 90%;
+}
+
+.voice-transcript {
+    font-size: 14px;
+    color: #888;
+    margin-bottom: 20px;
+    font-style: italic;
+}
+
+.voice-meal-preview {
+    background: #0a0a0a;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.voice-meal-name {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.voice-macros {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    font-size: 14px;
+}
+
+.voice-macro {
+    text-align: center;
+}
+
+.voice-macro-value {
+    font-size: 20px;
+    font-weight: 700;
+    color: #00ff88;
+}
+
+.voice-macro-label {
+    font-size: 11px;
+    color: #666;
+    text-transform: uppercase;
+}
+
+.voice-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.voice-btn {
+    flex: 1;
+    padding: 14px;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.voice-btn-confirm {
+    background: linear-gradient(135deg, #00d4ff, #00ff88);
+    color: #0a0a0a;
+}
+
+.voice-btn-cancel {
+    background: #2a2a2a;
+    color: #fff;
+}
+
+.voice-status {
+    position: fixed;
+    bottom: 160px;
+    right: 20px;
+    background: #1a1a1a;
+    padding: 12px 20px;
+    border-radius: 20px;
+    font-size: 14px;
+    display: none;
+    z-index: 1000;
+}
+
+.voice-status.show {
+    display: block;
+}
+</style>
+
+<button class="voice-button" id="voiceButton">
+    <svg viewBox="0 0 24 24">
+        <path d="M12 15c1.66 0 3-1.34 3-3V6c0-1.66-1.34-3-3-3S9 4.34 9 6v6c0 1.66 1.34 3 3 3z"/>
+        <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+    </svg>
+</button>
+
+<div class="voice-status" id="voiceStatus">Listening...</div>
+
+<div class="voice-confirm-modal" id="voiceConfirmModal">
+    <div class="voice-confirm-content">
+        <div class="voice-transcript" id="voiceTranscript"></div>
+        <div class="voice-meal-preview">
+            <div class="voice-meal-name" id="voiceMealName"></div>
+            <div class="voice-macros">
+                <div class="voice-macro">
+                    <div class="voice-macro-value" id="voiceCalories">0</div>
+                    <div class="voice-macro-label">Calories</div>
+                </div>
+                <div class="voice-macro">
+                    <div class="voice-macro-value" id="voiceProtein">0</div>
+                    <div class="voice-macro-label">Protein</div>
+                </div>
+                <div class="voice-macro">
+                    <div class="voice-macro-value" id="voiceCarbs">0</div>
+                    <div class="voice-macro-label">Carbs</div>
+                </div>
+            </div>
+        </div>
+        <div class="voice-buttons">
+            <button class="voice-btn voice-btn-cancel" onclick="cancelVoiceLog()">Cancel</button>
+            <button class="voice-btn voice-btn-confirm" onclick="confirmVoiceLog()">Log It</button>
+        </div>
+    </div>
+</div>
+
+<script>
+let mediaRecorder;
+let audioChunks = [];
+let pendingMeal = null;
+
+const voiceButton = document.getElementById('voiceButton');
+const voiceStatus = document.getElementById('voiceStatus');
+const voiceModal = document.getElementById('voiceConfirmModal');
+
+// Hold to record
+voiceButton.addEventListener('mousedown', startRecording);
+voiceButton.addEventListener('mouseup', stopRecording);
+voiceButton.addEventListener('touchstart', startRecording);
+voiceButton.addEventListener('touchend', stopRecording);
+
+async function startRecording(e) {
+    e.preventDefault();
+    
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorder = new MediaRecorder(stream);
+        audioChunks = [];
+        
+        mediaRecorder.ondataavailable = (event) => {
+            audioChunks.push(event.data);
+        };
+        
+        mediaRecorder.onstop = async () => {
+            const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+            await processVoice(audioBlob);
+            stream.getTracks().forEach(track => track.stop());
+        };
+        
+        mediaRecorder.start();
+        voiceButton.classList.add('recording');
+        voiceStatus.classList.add('show');
+        
+    } catch (err) {
+        alert('Microphone access denied');
+    }
+}
+
+function stopRecording() {
+    if (mediaRecorder && mediaRecorder.state === 'recording') {
+        mediaRecorder.stop();
+        voiceButton.classList.remove('recording');
+        voiceStatus.classList.remove('show');
+    }
+}
+
+async function processVoice(audioBlob) {
+    const formData = new FormData();
+    formData.append('audio', audioBlob);
+    
+    try {
+        const response = await fetch('/api/voice_log', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            // Show confirmation modal
+            document.getElementById('voiceTranscript').textContent = `You said: "${result.transcript}"`;
+            document.getElementById('voiceMealName').textContent = result.meal.food;
+            document.getElementById('voiceCalories').textContent = result.meal.calories;
+            document.getElementById('voiceProtein').textContent = result.meal.protein + 'g';
+            document.getElementById('voiceCarbs').textContent = result.meal.carbs + 'g';
+            
+            pendingMeal = result.meal;
+            voiceModal.classList.add('show');
+        } else {
+            alert('Failed to process voice: ' + result.error);
+        }
+    } catch (err) {
+        alert('Error processing voice');
+    }
+}
+
+async function confirmVoiceLog() {
+    if (!pendingMeal) return;
+    
+    try {
+        await fetch('/api/add_meal', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                description: pendingMeal.food,
+                calories: pendingMeal.calories,
+                protein: pendingMeal.protein,
+                carbs: pendingMeal.carbs,
+                fat: pendingMeal.fat
+            })
+        });
+        
+        voiceModal.classList.remove('show');
+        pendingMeal = null;
+        location.reload(); // Refresh dashboard
+    } catch (err) {
+        alert('Failed to log meal');
+    }
+}
+
+function cancelVoiceLog() {
+    voiceModal.classList.remove('show');
+    pendingMeal = null;
+}
+</script>

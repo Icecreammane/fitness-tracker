@@ -1,0 +1,234 @@
+<!-- Progress Card Generator Modal -->
+<div class="modal-overlay" id="progress-card-modal">
+    <div class="modal">
+        <div class="modal-header">
+            <div class="modal-title">📊 Weekly Progress Card</div>
+            <button class="modal-close" onclick="closeProgressCardModal()">×</button>
+        </div>
+        <div class="modal-body" style="text-align: center;">
+            <!-- Card Preview (Instagram dimensions: 1080x1350) -->
+            <div id="progress-card-preview" style="
+                width: 320px;
+                height: 400px;
+                margin: 0 auto 20px;
+                background: linear-gradient(135deg, #00d4ff, #00ff88);
+                border-radius: 20px;
+                padding: 40px 30px;
+                position: relative;
+                color: #0a0a0a;
+            ">
+                <div style="font-size: 16px; font-weight: 600; margin-bottom: 20px;">
+                    MY WEEK WITH LEAN
+                </div>
+                
+                <!-- Weight Lost -->
+                <div style="margin: 30px 0;">
+                    <div style="font-size: 14px; opacity: 0.8; margin-bottom: 8px;">WEIGHT LOST</div>
+                    <div style="font-size: 48px; font-weight: 700;" id="card-weight-lost">0 lbs</div>
+                </div>
+                
+                <!-- Stats Grid -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 30px 0;">
+                    <div style="background: rgba(10, 10, 10, 0.1); border-radius: 12px; padding: 15px;">
+                        <div style="font-size: 32px; font-weight: 700;" id="card-streak">0🔥</div>
+                        <div style="font-size: 12px; opacity: 0.8;">Day Streak</div>
+                    </div>
+                    <div style="background: rgba(10, 10, 10, 0.1); border-radius: 12px; padding: 15px;">
+                        <div style="font-size: 32px; font-weight: 700;" id="card-meals">0</div>
+                        <div style="font-size: 12px; opacity: 0.8;">Meals Logged</div>
+                    </div>
+                </div>
+                
+                <!-- Deficit -->
+                <div style="margin: 20px 0;">
+                    <div style="font-size: 14px; opacity: 0.8; margin-bottom: 5px;">AVG DAILY DEFICIT</div>
+                    <div style="font-size: 28px; font-weight: 700;" id="card-deficit">0 cal</div>
+                </div>
+                
+                <!-- Watermark -->
+                <div style="
+                    position: absolute;
+                    bottom: 15px;
+                    left: 0;
+                    right: 0;
+                    text-align: center;
+                    font-size: 12px;
+                    font-weight: 700;
+                    opacity: 0.6;
+                ">
+                    🔥 trylean.app
+                </div>
+            </div>
+            
+            <!-- Loading State -->
+            <div id="card-loading" style="display: none; margin: 20px 0;">
+                <div class="loading-spinner" style="margin: 0 auto;"></div>
+                <div style="color: #888; margin-top: 10px;">Generating your card...</div>
+            </div>
+            
+            <!-- Action Buttons -->
+            <button class="onboarding-btn" onclick="downloadProgressCard()" style="width: 100%; margin-bottom: 10px;">
+                📥 Download Card
+            </button>
+            <button class="btn-secondary" onclick="shareProgressCard()" style="width: 100%;">
+                📱 Share to Instagram
+            </button>
+            
+            <div style="margin-top: 20px; font-size: 13px; color: #666;">
+                Perfect for Instagram Stories (1080x1350)
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let progressCardData = null;
+
+function openProgressCardModal() {
+    document.getElementById('progress-card-modal').classList.add('active');
+    loadProgressCardData();
+}
+
+function closeProgressCardModal() {
+    document.getElementById('progress-card-modal').classList.remove('active');
+}
+
+async function loadProgressCardData() {
+    document.getElementById('card-loading').style.display = 'block';
+    
+    try {
+        const res = await fetch('/api/progress_card');
+        const data = await res.json();
+        
+        if (!data.success) {
+            showToast('❌ Failed to load progress data');
+            return;
+        }
+        
+        progressCardData = data.card_data;
+        
+        // Update card preview
+        document.getElementById('card-weight-lost').textContent = 
+            progressCardData.weight_lost.toFixed(1) + ' lbs';
+        document.getElementById('card-streak').textContent = 
+            progressCardData.streak + '🔥';
+        document.getElementById('card-meals').textContent = 
+            progressCardData.meals_logged;
+        document.getElementById('card-deficit').textContent = 
+            progressCardData.avg_deficit + ' cal';
+        
+        document.getElementById('card-loading').style.display = 'none';
+        
+    } catch (err) {
+        showToast('❌ Error loading progress data');
+        console.error(err);
+        document.getElementById('card-loading').style.display = 'none';
+    }
+}
+
+async function downloadProgressCard() {
+    showToast('Generating card...');
+    
+    try {
+        // Create a larger canvas for Instagram (1080x1350)
+        const preview = document.getElementById('progress-card-preview');
+        
+        // Use html2canvas to capture the card
+        const canvas = await html2canvas(preview, {
+            backgroundColor: null,
+            scale: 3.375, // 320px * 3.375 = 1080px
+            width: 320,
+            height: 400
+        });
+        
+        // Resize to exact Instagram dimensions if needed
+        const finalCanvas = document.createElement('canvas');
+        finalCanvas.width = 1080;
+        finalCanvas.height = 1350;
+        const ctx = finalCanvas.getContext('2d');
+        
+        // Center the card vertically
+        const yOffset = (1350 - 400 * 3.375) / 2;
+        ctx.drawImage(canvas, 0, yOffset, 1080, 400 * 3.375);
+        
+        // Convert to blob and download
+        finalCanvas.toBlob((blob) => {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `lean_progress_${new Date().toISOString().split('T')[0]}.png`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('✅ Card downloaded!');
+        }, 'image/png');
+        
+    } catch (err) {
+        showToast('❌ Download failed');
+        console.error(err);
+    }
+}
+
+async function shareProgressCard() {
+    try {
+        const preview = document.getElementById('progress-card-preview');
+        const canvas = await html2canvas(preview, {
+            backgroundColor: null,
+            scale: 3.375,
+            width: 320,
+            height: 400
+        });
+        
+        // Resize to Instagram dimensions
+        const finalCanvas = document.createElement('canvas');
+        finalCanvas.width = 1080;
+        finalCanvas.height = 1350;
+        const ctx = finalCanvas.getContext('2d');
+        const yOffset = (1350 - 400 * 3.375) / 2;
+        ctx.drawImage(canvas, 0, yOffset, 1080, 400 * 3.375);
+        
+        finalCanvas.toBlob(async (blob) => {
+            // Try native share API
+            if (navigator.share && navigator.canShare) {
+                const file = new File([blob], 'lean-progress.png', { type: 'image/png' });
+                
+                if (navigator.canShare({ files: [file] })) {
+                    try {
+                        await navigator.share({
+                            files: [file],
+                            title: 'My Lean Progress',
+                            text: `Lost ${progressCardData.weight_lost.toFixed(1)} lbs this week! 🔥`
+                        });
+                        showToast('✅ Shared!');
+                    } catch (err) {
+                        // User cancelled or error
+                        if (err.name !== 'AbortError') {
+                            console.error(err);
+                        }
+                    }
+                } else {
+                    // Fallback to download
+                    downloadProgressCard();
+                }
+            } else {
+                // No share API, download instead
+                downloadProgressCard();
+                showToast('💡 Card downloaded - share from your photos!');
+            }
+        }, 'image/png');
+        
+    } catch (err) {
+        showToast('❌ Share failed');
+        console.error(err);
+    }
+}
+
+// Add progress card button to header
+window.addEventListener('DOMContentLoaded', () => {
+    // Replace the existing share button functionality
+    const shareBtn = document.querySelector('[onclick="shareProgress()"]');
+    if (shareBtn) {
+        shareBtn.onclick = openProgressCardModal;
+        shareBtn.title = 'Weekly Progress Card';
+    }
+});
+</script>

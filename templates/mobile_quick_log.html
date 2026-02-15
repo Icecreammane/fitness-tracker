@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Quick Log - FitTrack</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #0a0e27;
+            color: #e0e0e0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            background: #1e293b;
+            padding: 16px 20px;
+            border-bottom: 1px solid #334155;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            font-size: 20px;
+            color: #60a5fa;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 4px;
+        }
+        
+        .tab-bar {
+            display: flex;
+            background: #1e293b;
+            border-bottom: 1px solid #334155;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 16px;
+            text-align: center;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            color: #94a3b8;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .tab.active {
+            color: #60a5fa;
+            border-bottom-color: #60a5fa;
+        }
+        
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        
+        .quick-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        
+        .quick-btn {
+            background: #1e293b;
+            border: 2px solid #334155;
+            border-radius: 16px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        
+        .quick-btn:active {
+            transform: scale(0.95);
+            background: #334155;
+        }
+        
+        .quick-btn-icon {
+            font-size: 36px;
+            margin-bottom: 8px;
+        }
+        
+        .quick-btn-label {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .quick-btn-value {
+            font-size: 12px;
+            color: #94a3b8;
+        }
+        
+        .streak-card {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+        
+        .streak-number {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        
+        .streak-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        .input-label {
+            font-size: 13px;
+            color: #94a3b8;
+            margin-bottom: 8px;
+            display: block;
+            font-weight: 600;
+        }
+        
+        .input-field {
+            width: 100%;
+            padding: 18px;
+            background: #1e293b;
+            border: 2px solid #334155;
+            border-radius: 12px;
+            color: #e0e0e0;
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        .input-field:focus {
+            outline: none;
+            border-color: #60a5fa;
+        }
+        
+        .submit-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 17px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .submit-btn:active {
+            transform: scale(0.97);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .today-summary {
+            background: #1e293b;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #334155;
+        }
+        
+        .summary-row:last-child {
+            border-bottom: none;
+        }
+        
+        .summary-label {
+            color: #94a3b8;
+        }
+        
+        .summary-value {
+            font-weight: 600;
+            color: #60a5fa;
+        }
+        
+        .protein-progress {
+            background: #1e293b;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+        
+        .progress-bar {
+            height: 24px;
+            background: #0f172a;
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6, #60a5fa);
+            transition: width 0.5s ease;
+            border-radius: 12px;
+        }
+        
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 12px;
+            font-weight: 700;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>⚡ Quick Log</h1>
+        <button class="close-btn" onclick="window.history.back()">×</button>
+    </div>
+    
+    <div class="tab-bar">
+        <button class="tab active" onclick="switchTab('quick')">Quick Add</button>
+        <button class="tab" onclick="switchTab('custom')">Custom</button>
+        <button class="tab" onclick="switchTab('stats')">Today</button>
+    </div>
+    
+    <div class="content">
+        <!-- Quick Add Tab -->
+        <div class="tab-content active" id="quick-tab">
+            <div class="streak-card">
+                <div class="streak-number">🔥 7</div>
+                <div class="streak-label">Day Streak!</div>
+            </div>
+            
+            <div class="quick-buttons">
+                <button class="quick-btn" onclick="quickLog('chicken', 200)">
+                    <div class="quick-btn-icon">🍗</div>
+                    <div class="quick-btn-label">Chicken</div>
+                    <div class="quick-btn-value">40g protein</div>
+                </button>
+                
+                <button class="quick-btn" onclick="quickLog('protein-shake', 150)">
+                    <div class="quick-btn-icon">🥤</div>
+                    <div class="quick-btn-label">Protein Shake</div>
+                    <div class="quick-btn-value">30g protein</div>
+                </button>
+                
+                <button class="quick-btn" onclick="quickLog('eggs', 140)">
+                    <div class="quick-btn-icon">🥚</div>
+                    <div class="quick-btn-label">3 Eggs</div>
+                    <div class="quick-btn-value">18g protein</div>
+                </button>
+                
+                <button class="quick-btn" onclick="quickLog('greek-yogurt', 100)">
+                    <div class="quick-btn-icon">🥣</div>
+                    <div class="quick-btn-label">Greek Yogurt</div>
+                    <div class="quick-btn-value">15g protein</div>
+                </button>
+                
+                <button class="quick-btn" onclick="quickLog('salmon', 200)">
+                    <div class="quick-btn-icon">🐟</div>
+                    <div class="quick-btn-label">Salmon</div>
+                    <div class="quick-btn-value">35g protein</div>
+                </button>
+                
+                <button class="quick-btn" onclick="quickLog('beef', 250)">
+                    <div class="quick-btn-icon">🥩</div>
+                    <div class="quick-btn-label">Beef</div>
+                    <div class="quick-btn-value">45g protein</div>
+                </button>
+            </div>
+            
+            <h3 style="margin-bottom: 12px; font-size: 16px;">Workouts</h3>
+            <div class="quick-buttons">
+                <button class="quick-btn" onclick="quickLogWorkout('volleyball')">
+                    <div class="quick-btn-icon">🏐</div>
+                    <div class="quick-btn-label">Volleyball</div>
+                    <div class="quick-btn-value">60 min session</div>
+                </button>
+                
+                <button class="quick-btn" onclick="quickLogWorkout('gym')">
+                    <div class="quick-btn-icon">🏋️</div>
+                    <div class="quick-btn-label">Gym</div>
+                    <div class="quick-btn-value">45 min lift</div>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Custom Entry Tab -->
+        <div class="tab-content" id="custom-tab">
+            <form onsubmit="logCustom(event)">
+                <div class="input-group">
+                    <label class="input-label">Food/Meal Name</label>
+                    <input type="text" class="input-field" placeholder="e.g., Chicken Salad" required>
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label">Protein (g)</label>
+                    <input type="number" class="input-field" placeholder="0" min="0">
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label">Carbs (g)</label>
+                    <input type="number" class="input-field" placeholder="0" min="0">
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label">Fat (g)</label>
+                    <input type="number" class="input-field" placeholder="0" min="0">
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label">Calories</label>
+                    <input type="number" class="input-field" placeholder="0" min="0">
+                </div>
+                
+                <button type="submit" class="submit-btn">
+                    ✅ Log Food
+                </button>
+            </form>
+        </div>
+        
+        <!-- Today's Stats Tab -->
+        <div class="tab-content" id="stats-tab">
+            <div class="today-summary">
+                <h3 style="margin-bottom: 16px;">Today's Nutrition</h3>
+                <div class="summary-row">
+                    <span class="summary-label">Calories</span>
+                    <span class="summary-value">1,680 / 2,400</span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">Protein</span>
+                    <span class="summary-value">145g / 180g</span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">Carbs</span>
+                    <span class="summary-value">180g / 240g</span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">Fat</span>
+                    <span class="summary-value">55g / 70g</span>
+                </div>
+            </div>
+            
+            <div class="protein-progress">
+                <div class="progress-header">
+                    <span style="font-weight: 600;">Protein Goal</span>
+                    <span style="color: #60a5fa; font-weight: 700;">81%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 81%;"></div>
+                    <div class="progress-text">145g / 180g</div>
+                </div>
+            </div>
+            
+            <div class="today-summary">
+                <h3 style="margin-bottom: 16px;">Today's Workouts</h3>
+                <div class="summary-row">
+                    <span class="summary-label">🏐 Volleyball</span>
+                    <span class="summary-value">60 min</span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">🏋️ Gym</span>
+                    <span class="summary-value">45 min</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function switchTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(tabName + '-tab').classList.add('active');
+        }
+        
+        function quickLog(food, calories) {
+            // Vibrate on tap (if supported)
+            if (navigator.vibrate) {
+                navigator.vibrate(50);
+            }
+            
+            alert(`Logged: ${food} (${calories} cal)\n\n✅ Added to your daily log!`);
+            
+            // In production, send to backend
+            // fetch('/api/log', { method: 'POST', body: JSON.stringify({food, calories}) })
+        }
+        
+        function quickLogWorkout(workout) {
+            if (navigator.vibrate) {
+                navigator.vibrate(50);
+            }
+            
+            alert(`Logged: ${workout} workout\n\n✅ Great session!`);
+        }
+        
+        function logCustom(event) {
+            event.preventDefault();
+            
+            if (navigator.vibrate) {
+                navigator.vibrate([50, 100, 50]);
+            }
+            
+            alert('✅ Custom food logged!\n\nAdded to your daily totals.');
+            event.target.reset();
+        }
+    </script>
+</body>
+</html>

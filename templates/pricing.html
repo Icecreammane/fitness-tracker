@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pricing - FitTrack Pro</title>
+    <script src="https://js.stripe.com/v3/"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #10b981;
+            --accent: #f59e0b;
+            --bg: #ffffff;
+            --bg-secondary: #f8fafc;
+            --text: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Roboto, sans-serif;
+            background: var(--bg-secondary);
+        }
+        
+        /* Navigation */
+        .nav {
+            background: white;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .nav-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 32px;
+            align-items: center;
+        }
+        
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+        
+        /* Hero */
+        .hero {
+            max-width: 800px;
+            margin: 60px auto;
+            text-align: center;
+            padding: 0 20px;
+        }
+        
+        .hero h1 {
+            font-size: clamp(2.5rem, 5vw, 3.5rem);
+            font-weight: 800;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, var(--text) 0%, var(--primary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+        }
+        
+        .trust-badges {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            flex-wrap: wrap;
+            margin-top: 32px;
+        }
+        
+        .trust-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        .trust-badge span:first-child {
+            font-size: 1.2rem;
+        }
+        
+        /* Pricing Card */
+        .pricing-container {
+            max-width: 600px;
+            margin: 60px auto;
+            padding: 0 20px;
+        }
+        
+        .price-card {
+            background: white;
+            padding: 48px;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            border: 3px solid var(--primary);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .price-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+        }
+        
+        .popular-badge {
+            position: absolute;
+            top: 24px;
+            right: -32px;
+            background: linear-gradient(135deg, var(--secondary), #059669);
+            color: white;
+            padding: 6px 40px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            transform: rotate(45deg);
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4);
+        }
+        
+        .trial-badge {
+            background: linear-gradient(135deg, var(--accent), #ea580c);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 12px;
+            display: inline-block;
+            margin-bottom: 24px;
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+        
+        .price-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .plan-name {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+        
+        .price-display {
+            margin: 24px 0;
+        }
+        
+        .price {
+            font-size: 5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1;
+            display: inline-block;
+        }
+        
+        .price-period {
+            font-size: 1.75rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+            margin-left: 4px;
+        }
+        
+        .price-subtitle {
+            color: var(--text-secondary);
+            margin-top: 12px;
+            font-size: 1rem;
+        }
+        
+        .features-list {
+            list-style: none;
+            margin: 32px 0;
+        }
+        
+        .features-list li {
+            padding: 16px;
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            transition: background 0.2s;
+            border-radius: 8px;
+        }
+        
+        .features-list li:hover {
+            background: var(--bg-secondary);
+        }
+        
+        .feature-icon {
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+        
+        .feature-text {
+            flex: 1;
+        }
+        
+        .feature-text strong {
+            display: block;
+            margin-bottom: 4px;
+            color: var(--text);
+            font-size: 1.05rem;
+        }
+        
+        .feature-text span {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+        
+        .cta-button {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            border: none;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px rgba(99, 102, 241, 0.4);
+        }
+        
+        .cta-note {
+            text-align: center;
+            margin-top: 16px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        .guarantee {
+            background: #f0fdf4;
+            border: 2px solid var(--secondary);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 32px;
+            text-align: center;
+        }
+        
+        .guarantee-title {
+            font-weight: 700;
+            color: var(--secondary);
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+        
+        .guarantee-text {
+            color: #166534;
+            font-size: 0.95rem;
+        }
+        
+        /* FAQ Section */
+        .faq {
+            max-width: 800px;
+            margin: 80px auto 60px;
+            padding: 0 20px;
+        }
+        
+        .faq-header {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+        
+        .faq-header h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+        
+        .faq-item {
+            background: white;
+            padding: 32px;
+            border-radius: 16px;
+            margin-bottom: 16px;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+        
+        .faq-item:hover {
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+        
+        .faq-question {
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-bottom: 12px;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .faq-question::before {
+            content: "Q";
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+        
+        .faq-answer {
+            color: var(--text-secondary);
+            line-height: 1.7;
+            font-size: 1rem;
+            margin-left: 44px;
+        }
+        
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .price-card {
+                padding: 32px 24px;
+            }
+            
+            .price {
+                font-size: 4rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav">
+        <div class="nav-content">
+            <div class="logo">
+                <span>💪</span>
+                <span>FitTrack Pro</span>
+            </div>
+            <div class="nav-links">
+                <a href="/">Home</a>
+                <a href="/how-it-works">How It Works</a>
+                <a href="/login">Login</a>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <h1>Start Your Fitness Journey Today</h1>
+        <p>Simple, powerful tracking tools. One transparent price. No hidden fees.</p>
+        
+        <div class="trust-badges">
+            <div class="trust-badge">
+                <span>✓</span>
+                <span>7-day free trial</span>
+            </div>
+            <div class="trust-badge">
+                <span>✓</span>
+                <span>No credit card required</span>
+            </div>
+            <div class="trust-badge">
+                <span>✓</span>
+                <span>Cancel anytime</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="pricing-container">
+        <div class="price-card">
+            <div class="popular-badge">BEST VALUE</div>
+            
+            <div class="price-header">
+                <div class="trial-badge">🎉 Start With 7 Days Free</div>
+                <h2 class="plan-name">Monthly Subscription</h2>
+                
+                <div class="price-display">
+                    <span class="price">$10</span>
+                    <span class="price-period">/month</span>
+                    <p class="price-subtitle">Billed monthly • Cancel anytime</p>
+                </div>
+            </div>
+
+            <ul class="features-list">
+                <li>
+                    <span class="feature-icon">🍽️</span>
+                    <div class="feature-text">
+                        <strong>Unlimited Macro Tracking</strong>
+                        <span>Log all your meals with detailed nutritional breakdowns</span>
+                    </div>
+                </li>
+                <li>
+                    <span class="feature-icon">💪</span>
+                    <div class="feature-text">
+                        <strong>Workout Logging & 1RM Calculator</strong>
+                        <span>Track progressive overload and strength gains automatically</span>
+                    </div>
+                </li>
+                <li>
+                    <span class="feature-icon">📈</span>
+                    <div class="feature-text">
+                        <strong>Weight & Progress Charts</strong>
+                        <span>Beautiful visualizations of your fitness journey</span>
+                    </div>
+                </li>
+                <li>
+                    <span class="feature-icon">📊</span>
+                    <div class="feature-text">
+                        <strong>7-Day Macro History</strong>
+                        <span>Review and optimize your nutrition patterns</span>
+                    </div>
+                </li>
+                <li>
+                    <span class="feature-icon">📱</span>
+                    <div class="feature-text">
+                        <strong>Mobile Responsive</strong>
+                        <span>Access from any device, anywhere</span>
+                    </div>
+                </li>
+                <li>
+                    <span class="feature-icon">🔒</span>
+                    <div class="feature-text">
+                        <strong>Private & Secure</strong>
+                        <span>Your data is encrypted and never shared</span>
+                    </div>
+                </li>
+            </ul>
+
+            <button class="cta-button" onclick="subscribe()">
+                <span>Start Free 7-Day Trial</span>
+                <span>→</span>
+            </button>
+            
+            <p class="cta-note">
+                No credit card required during trial • Full access to all features
+            </p>
+            
+            <div class="guarantee">
+                <div class="guarantee-title">💯 30-Day Money-Back Guarantee</div>
+                <div class="guarantee-text">
+                    Not satisfied? Get a full refund within 30 days, no questions asked.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="faq">
+        <div class="faq-header">
+            <h2>Frequently Asked Questions</h2>
+        </div>
+        
+        <div class="faq-item">
+            <div class="faq-question">How does the free trial work?</div>
+            <div class="faq-answer">
+                Sign up with your email and get instant access to all features for 7 days. No credit card required during the trial. After 7 days, subscribe to continue using FitTrack Pro.
+            </div>
+        </div>
+        
+        <div class="faq-item">
+            <div class="faq-question">Can I cancel my subscription anytime?</div>
+            <div class="faq-answer">
+                Absolutely! Cancel from your account settings at any time. No commitments, no penalties, no questions asked. You'll retain access until the end of your billing period.
+            </div>
+        </div>
+        
+        <div class="faq-item">
+            <div class="faq-question">What happens to my data if I cancel?</div>
+            <div class="faq-answer">
+                Your data is safely stored for 90 days after cancellation. You can reactivate your subscription anytime and pick up right where you left off.
+            </div>
+        </div>
+        
+        <div class="faq-item">
+            <div class="faq-question">What payment methods do you accept?</div>
+            <div class="faq-answer">
+                We accept all major credit and debit cards through Stripe, our secure payment processor. Your payment information is encrypted and never stored on our servers.
+            </div>
+        </div>
+        
+        <div class="faq-item">
+            <div class="faq-question">Is my data secure and private?</div>
+            <div class="faq-answer">
+                Yes! Your fitness data is encrypted end-to-end and stored securely. We never share, sell, or use your data for advertising. Your privacy is our top priority.
+            </div>
+        </div>
+        
+        <div class="faq-item">
+            <div class="faq-question">Do you offer refunds?</div>
+            <div class="faq-answer">
+                Yes. If you're not satisfied within 30 days of subscribing, we'll give you a full refund, no questions asked. Just email support and we'll process it immediately.
+            </div>
+        </div>
+    </section>
+
+    <script>
+        async function subscribe() {
+            try {
+                const response = await fetch('/create-checkout-session', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.url) {
+                    window.location.href = data.url;
+                } else if (data.error) {
+                    alert('Error: ' + data.error);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                // If not logged in, redirect to signup
+                window.location.href = '/signup';
+            }
+        }
+    </script>
+</body>
+</html>

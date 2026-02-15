@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fitness Dashboard - Ross</title>
+    <link rel="stylesheet" href="/static/styles/jarvis-design-system.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .macro-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: var(--space-4);
+            margin-bottom: var(--space-6);
+        }
+        
+        .macro-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: var(--space-5);
+        }
+        
+        .macro-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-3);
+        }
+        
+        .macro-name {
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+        }
+        
+        .macro-values {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: var(--space-3);
+        }
+        
+        .macro-current {
+            color: var(--text-primary);
+        }
+        
+        .macro-goal {
+            font-size: 1rem;
+            color: var(--text-tertiary);
+        }
+        
+        .macro-bar-wrapper {
+            position: relative;
+            margin-bottom: var(--space-2);
+        }
+        
+        .macro-progress {
+            height: 12px;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-full);
+            overflow: hidden;
+        }
+        
+        .macro-progress-fill {
+            height: 100%;
+            border-radius: var(--radius-full);
+            transition: width 0.5s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .macro-progress-fill.protein {
+            background: linear-gradient(90deg, #3b82f6, #60a5fa);
+        }
+        
+        .macro-progress-fill.carbs {
+            background: linear-gradient(90deg, #10b981, #34d399);
+        }
+        
+        .macro-progress-fill.fat {
+            background: linear-gradient(90deg, #f59e0b, #fbbf24);
+        }
+        
+        .macro-progress-fill.calories {
+            background: linear-gradient(90deg, #8b5cf6, #a78bfa);
+        }
+        
+        .macro-status {
+            font-size: 0.75rem;
+            color: var(--text-tertiary);
+        }
+        
+        .chart-section {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: var(--space-6);
+            margin-bottom: var(--space-6);
+        }
+        
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-5);
+        }
+        
+        .chart-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 280px;
+        }
+        
+        .quick-add-section {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: var(--space-5);
+            margin-bottom: var(--space-6);
+        }
+        
+        .quick-add-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: var(--space-3);
+            margin-top: var(--space-4);
+        }
+        
+        .quick-add-btn {
+            padding: var(--space-4);
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            text-align: center;
+        }
+        
+        .quick-add-btn:hover {
+            background: var(--bg-elevated);
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+        
+        .quick-add-icon {
+            font-size: 2rem;
+            margin-bottom: var(--space-2);
+        }
+        
+        .quick-add-label {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        @media (max-width: 768px) {
+            .chart-container {
+                height: 220px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav-bar">
+        <div class="nav-content">
+            <div class="nav-logo">
+                <span>🤖</span>
+                <span>Jarvis</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="/" class="nav-link">
+                    <span class="nav-link-icon">🏠</span>
+                    <span>Hub</span>
+                </a></li>
+                <li><a href="http://10.0.0.18:3000/" class="nav-link active">
+                    <span class="nav-link-icon">💪</span>
+                    <span>Fitness</span>
+                </a></li>
+                <li><a href="http://10.0.0.18:8080/goals/progress.html" class="nav-link">
+                    <span class="nav-link-icon">🎯</span>
+                    <span>Goals</span>
+                </a></li>
+                <li><a href="/florida-fund.html" class="nav-link">
+                    <span class="nav-link-icon">🌴</span>
+                    <span>Florida</span>
+                </a></li>
+                <li><a href="/morning-brief.html" class="nav-link">
+                    <span class="nav-link-icon">☀️</span>
+                    <span>Brief</span>
+                </a></li>
+            </ul>
+            <div class="nav-actions">
+                <button class="btn btn-icon btn-ghost" onclick="location.reload()" title="Refresh">
+                    <span>🔄</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="page-wrapper">
+        <div class="container">
+            <!-- Page Header -->
+            <div class="page-header animate-in">
+                <h1 class="page-title">
+                    <span>💪</span>
+                    <span>Fitness Tracker</span>
+                </h1>
+                <p class="page-subtitle">Real-time macro tracking and progress monitoring</p>
+            </div>
+
+            <!-- Today's Stats -->
+            <div class="grid grid-4 animate-in" style="margin-bottom: var(--space-6);">
+                <div class="stat-card">
+                    <div class="stat-label">Calories</div>
+                    <div class="stat-value" id="calories-stat">0</div>
+                    <div class="stat-change neutral">
+                        <span id="calories-remaining">0 left</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Protein</div>
+                    <div class="stat-value" id="protein-stat">0g</div>
+                    <div class="stat-change neutral">
+                        <span id="protein-remaining">0g left</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Weight</div>
+                    <div class="stat-value" id="weight-stat">--</div>
+                    <div class="stat-change neutral">
+                        <span>Current</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Streak</div>
+                    <div class="stat-value">7</div>
+                    <div class="stat-change positive">
+                        <span>🔥</span>
+                        <span>Days logging</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Macro Progress Bars -->
+            <div class="macro-grid animate-in">
+                <div class="macro-card">
+                    <div class="macro-header">
+                        <span class="macro-name">Protein</span>
+                        <span class="badge badge-primary">🥩</span>
+                    </div>
+                    <div class="macro-values">
+                        <span class="macro-current" id="protein-current">0</span>
+                        <span class="macro-goal">/ <span id="protein-goal">200</span>g</span>
+                    </div>
+                    <div class="macro-bar-wrapper">
+                        <div class="macro-progress">
+                            <div class="macro-progress-fill protein" id="protein-bar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <div class="macro-status" id="protein-status">On track</div>
+                </div>
+
+                <div class="macro-card">
+                    <div class="macro-header">
+                        <span class="macro-name">Carbs</span>
+                        <span class="badge badge-success">🍞</span>
+                    </div>
+                    <div class="macro-values">
+                        <span class="macro-current" id="carbs-current">0</span>
+                        <span class="macro-goal">/ <span id="carbs-goal">250</span>g</span>
+                    </div>
+                    <div class="macro-bar-wrapper">
+                        <div class="macro-progress">
+                            <div class="macro-progress-fill carbs" id="carbs-bar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <div class="macro-status" id="carbs-status">On track</div>
+                </div>
+
+                <div class="macro-card">
+                    <div class="macro-header">
+                        <span class="macro-name">Fat</span>
+                        <span class="badge badge-warning">🥑</span>
+                    </div>
+                    <div class="macro-values">
+                        <span class="macro-current" id="fat-current">0</span>
+                        <span class="macro-goal">/ <span id="fat-goal">70</span>g</span>
+                    </div>
+                    <div class="macro-bar-wrapper">
+                        <div class="macro-progress">
+                            <div class="macro-progress-fill fat" id="fat-bar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <div class="macro-status" id="fat-status">On track</div>
+                </div>
+
+                <div class="macro-card">
+                    <div class="macro-header">
+                        <span class="macro-name">Calories</span>
+                        <span class="badge badge-primary">🔥</span>
+                    </div>
+                    <div class="macro-values">
+                        <span class="macro-current" id="calories-current">0</span>
+                        <span class="macro-goal">/ <span id="calories-goal">2650</span></span>
+                    </div>
+                    <div class="macro-bar-wrapper">
+                        <div class="macro-progress">
+                            <div class="macro-progress-fill calories" id="calories-bar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <div class="macro-status" id="calories-status">On track</div>
+                </div>
+            </div>
+
+            <!-- Quick Add Actions -->
+            <div class="quick-add-section animate-in">
+                <h3 style="margin-bottom: var(--space-2);">Quick Add</h3>
+                <p style="color: var(--text-secondary); font-size: 0.875rem;">Send food photos to Jarvis via Telegram for instant logging</p>
+                <div class="quick-add-grid">
+                    <div class="quick-add-btn" onclick="alert('Send a photo to Jarvis on Telegram!')">
+                        <div class="quick-add-icon">📸</div>
+                        <div class="quick-add-label">Photo Log</div>
+                    </div>
+                    <div class="quick-add-btn" onclick="alert('Coming soon!')">
+                        <div class="quick-add-icon">⚖️</div>
+                        <div class="quick-add-label">Log Weight</div>
+                    </div>
+                    <div class="quick-add-btn" onclick="alert('Coming soon!')">
+                        <div class="quick-add-icon">💪</div>
+                        <div class="quick-add-label">Log Workout</div>
+                    </div>
+                    <div class="quick-add-btn" onclick="alert('Coming soon!')">
+                        <div class="quick-add-icon">💧</div>
+                        <div class="quick-add-label">Log Water</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Weight Trend Chart -->
+            <div class="chart-section animate-in">
+                <div class="chart-header">
+                    <h3 class="chart-title">
+                        <span>📈</span>
+                        <span>Weight Trend (7 Days)</span>
+                    </h3>
+                    <span class="badge badge-primary">Last Week</span>
+                </div>
+                <div class="chart-container">
+                    <canvas id="weightChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Macro Trend Chart -->
+            <div class="chart-section animate-in">
+                <div class="chart-header">
+                    <h3 class="chart-title">
+                        <span>🍽️</span>
+                        <span>Daily Macros (7 Days)</span>
+                    </h3>
+                    <span class="badge badge-primary">Last Week</span>
+                </div>
+                <div class="chart-container">
+                    <canvas id="macrosChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Chart.js Configuration
+        Chart.defaults.color = '#a3a3a3';
+        Chart.defaults.borderColor = '#262626';
+        
+        let weightChart, macrosChart;
+        
+        // Initialize charts
+        function initCharts() {
+            // Weight Chart
+            const weightCtx = document.getElementById('weightChart').getContext('2d');
+            weightChart = new Chart(weightCtx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Weight (lbs)',
+                        data: [],
+                        borderColor: '#6366f1',
+                        backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 5,
+                        pointHoverRadius: 7,
+                        pointBackgroundColor: '#6366f1'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            grid: { color: '#262626' }
+                        },
+                        x: {
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+            
+            // Macros Chart
+            const macrosCtx = document.getElementById('macrosChart').getContext('2d');
+            macrosChart = new Chart(macrosCtx, {
+                type: 'bar',
+                data: {
+                    labels: [],
+                    datasets: [
+                        {
+                            label: 'Protein (g)',
+                            data: [],
+                            backgroundColor: '#3b82f6',
+                            borderRadius: 6
+                        },
+                        {
+                            label: 'Carbs (g)',
+                            data: [],
+                            backgroundColor: '#10b981',
+                            borderRadius: 6
+                        },
+                        {
+                            label: 'Fat (g)',
+                            data: [],
+                            backgroundColor: '#f59e0b',
+                            borderRadius: 6
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: { padding: 15, usePointStyle: true }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#262626' }
+                        },
+                        x: {
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Fetch and update data
+        async function updateDashboard() {
+            try {
+                const response = await fetch('/api/stats');
+                const data = await response.json();
+                
+                // Update stat cards
+                document.getElementById('calories-stat').textContent = data.today.calories || 0;
+                document.getElementById('protein-stat').textContent = (data.today.protein || 0) + 'g';
+                document.getElementById('weight-stat').textContent = data.current_weight ? data.current_weight + ' lbs' : '--';
+                
+                // Update remaining
+                const calRemaining = (data.goals.calories || 2650) - (data.today.calories || 0);
+                const protRemaining = (data.goals.protein || 200) - (data.today.protein || 0);
+                document.getElementById('calories-remaining').textContent = calRemaining + ' left';
+                document.getElementById('protein-remaining').textContent = protRemaining + 'g left';
+                
+                // Update macro cards
+                updateMacroCard('protein', data.today.protein || 0, data.goals.protein || 200);
+                updateMacroCard('carbs', data.today.carbs || 0, data.goals.carbs || 250);
+                updateMacroCard('fat', data.today.fat || 0, data.goals.fat || 70);
+                updateMacroCard('calories', data.today.calories || 0, data.goals.calories || 2650);
+                
+                // Update charts
+                if (data.history) {
+                    updateWeightChart(data.history);
+                    updateMacrosChart(data.history);
+                }
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+        
+        function updateMacroCard(macro, current, goal) {
+            const percent = Math.min((current / goal) * 100, 100);
+            
+            document.getElementById(`${macro}-current`).textContent = Math.round(current);
+            document.getElementById(`${macro}-goal`).textContent = goal;
+            document.getElementById(`${macro}-bar`).style.width = percent + '%';
+            
+            let status = 'On track';
+            if (percent < 50) status = 'Needs attention';
+            else if (percent > 110) status = 'Over target';
+            else if (percent >= 90) status = 'Almost there!';
+            
+            document.getElementById(`${macro}-status`).textContent = status;
+        }
+        
+        function updateWeightChart(history) {
+            const labels = history.map(entry => {
+                const date = new Date(entry.date);
+                return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            });
+            const weights = history.map(entry => entry.weight);
+            
+            weightChart.data.labels = labels;
+            weightChart.data.datasets[0].data = weights;
+            weightChart.update();
+        }
+        
+        function updateMacrosChart(history) {
+            const labels = history.map(entry => {
+                const date = new Date(entry.date);
+                return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            });
+            
+            macrosChart.data.labels = labels;
+            macrosChart.data.datasets[0].data = history.map(e => e.protein || 0);
+            macrosChart.data.datasets[1].data = history.map(e => e.carbs || 0);
+            macrosChart.data.datasets[2].data = history.map(e => e.fat || 0);
+            macrosChart.update();
+        }
+        
+        // Initialize
+        initCharts();
+        updateDashboard();
+        
+        // Auto-refresh every 30 seconds
+        setInterval(updateDashboard, 30000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - FitTrack Pro</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #10b981;
+            --accent: #f59e0b;
+            --bg: #f8fafc;
+            --bg-card: #ffffff;
+            --text: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+        }
+        
+        /* Top Navigation */
+        .top-nav {
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+        
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .user-section {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .user-info {
+            text-align: right;
+        }
+        
+        .user-email {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: linear-gradient(135deg, var(--secondary), #059669);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+        
+        .logout-btn {
+            padding: 8px 16px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .logout-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        /* Main Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 32px 24px;
+        }
+        
+        /* Page Header */
+        .page-header {
+            margin-bottom: 32px;
+        }
+        
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+        
+        .page-subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+        
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+        
+        .stat-card {
+            background: var(--bg-card);
+            padding: 24px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+            border-color: var(--primary);
+        }
+        
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .stat-change {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        
+        /* Macro Cards */
+        .macro-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+        
+        .macro-card {
+            background: var(--bg-card);
+            padding: 24px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+        }
+        
+        .macro-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .macro-name {
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+        }
+        
+        .macro-icon {
+            font-size: 1.5rem;
+        }
+        
+        .macro-values {
+            margin-bottom: 16px;
+        }
+        
+        .macro-current {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--text);
+        }
+        
+        .macro-goal {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+        
+        .macro-bar {
+            height: 12px;
+            background: var(--bg);
+            border-radius: 100px;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+        
+        .macro-bar-fill {
+            height: 100%;
+            border-radius: 100px;
+            transition: width 0.5s ease;
+        }
+        
+        .macro-bar-fill.protein { background: linear-gradient(90deg, #6366f1, #8b5cf6); }
+        .macro-bar-fill.carbs { background: linear-gradient(90deg, #10b981, #14b8a6); }
+        .macro-bar-fill.fat { background: linear-gradient(90deg, #f59e0b, #ef4444); }
+        .macro-bar-fill.calories { background: linear-gradient(90deg, #3b82f6, #6366f1); }
+        
+        .macro-status {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        
+        /* Chart Sections */
+        .chart-section {
+            background: var(--bg-card);
+            padding: 32px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            margin-bottom: 24px;
+        }
+        
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        
+        .chart-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+        
+        /* Log Section */
+        .log-section {
+            background: var(--bg-card);
+            padding: 32px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            margin-bottom: 24px;
+        }
+        
+        .log-section h3 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+        
+        .input-group {
+            margin-bottom: 16px;
+        }
+        
+        .input-group label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 8px;
+        }
+        
+        .log-input {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: var(--bg);
+        }
+        
+        .log-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: white;
+        }
+        
+        textarea.log-input {
+            font-family: monospace;
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 14px 28px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
+        }
+        
+        /* Input Grid */
+        .input-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .macro-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .chart-container {
+                height: 240px;
+            }
+            
+            .input-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Navigation -->
+    <nav class="top-nav">
+        <div class="logo-section">
+            <span style="font-size: 2rem;">💪</span>
+            <span class="logo">FitTrack Pro</span>
+        </div>
+        <div class="user-section">
+            <div class="user-info">
+                <div class="user-email">{{ user.email }}</div>
+                <span class="status-badge">
+                    <span>✓</span>
+                    <span>Active</span>
+                </span>
+            </div>
+            <a href="/logout" class="logout-btn">Logout</a>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title">Your Dashboard</h1>
+            <p class="page-subtitle">Track your progress and stay on target</p>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Calories Today</div>
+                <div class="stat-value" id="calories-stat">0</div>
+                <div class="stat-change" id="calories-remaining">Loading...</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Protein Today</div>
+                <div class="stat-value" id="protein-stat">0g</div>
+                <div class="stat-change" id="protein-remaining">Loading...</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Current Weight</div>
+                <div class="stat-value" id="weight-stat">--</div>
+                <div class="stat-change">Latest weigh-in</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Streak</div>
+                <div class="stat-value">🔥 7</div>
+                <div class="stat-change">Days logging</div>
+            </div>
+        </div>
+
+        <!-- Macro Progress -->
+        <div class="macro-grid">
+            <div class="macro-card">
+                <div class="macro-header">
+                    <span class="macro-name">Protein</span>
+                    <span class="macro-icon">🥩</span>
+                </div>
+                <div class="macro-values">
+                    <span class="macro-current" id="protein-current">0</span>
+                    <span class="macro-goal"> / <span id="protein-goal">200</span>g</span>
+                </div>
+                <div class="macro-bar">
+                    <div class="macro-bar-fill protein" id="protein-bar" style="width: 0%"></div>
+                </div>
+                <div class="macro-status" id="protein-status">On track</div>
+            </div>
+
+            <div class="macro-card">
+                <div class="macro-header">
+                    <span class="macro-name">Carbs</span>
+                    <span class="macro-icon">🍞</span>
+                </div>
+                <div class="macro-values">
+                    <span class="macro-current" id="carbs-current">0</span>
+                    <span class="macro-goal"> / <span id="carbs-goal">250</span>g</span>
+                </div>
+                <div class="macro-bar">
+                    <div class="macro-bar-fill carbs" id="carbs-bar" style="width: 0%"></div>
+                </div>
+                <div class="macro-status" id="carbs-status">On track</div>
+            </div>
+
+            <div class="macro-card">
+                <div class="macro-header">
+                    <span class="macro-name">Fat</span>
+                    <span class="macro-icon">🥑</span>
+                </div>
+                <div class="macro-values">
+                    <span class="macro-current" id="fat-current">0</span>
+                    <span class="macro-goal"> / <span id="fat-goal">70</span>g</span>
+                </div>
+                <div class="macro-bar">
+                    <div class="macro-bar-fill fat" id="fat-bar" style="width: 0%"></div>
+                </div>
+                <div class="macro-status" id="fat-status">On track</div>
+            </div>
+
+            <div class="macro-card">
+                <div class="macro-header">
+                    <span class="macro-name">Calories</span>
+                    <span class="macro-icon">🔥</span>
+                </div>
+                <div class="macro-values">
+                    <span class="macro-current" id="calories-current">0</span>
+                    <span class="macro-goal"> / <span id="calories-goal">2650</span></span>
+                </div>
+                <div class="macro-bar">
+                    <div class="macro-bar-fill calories" id="calories-bar" style="width: 0%"></div>
+                </div>
+                <div class="macro-status" id="calories-status">On track</div>
+            </div>
+        </div>
+
+        <!-- Weight Chart -->
+        <div class="chart-section">
+            <div class="chart-header">
+                <h3 class="chart-title">📈 Weight Trend (7 Days)</h3>
+            </div>
+            <div class="chart-container">
+                <canvas id="weightChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Macros Chart -->
+        <div class="chart-section">
+            <div class="chart-header">
+                <h3 class="chart-title">🍽️ Daily Macros (7 Days)</h3>
+            </div>
+            <div class="chart-container">
+                <canvas id="macrosChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Log Food -->
+        <div class="log-section">
+            <h3>📝 Log Food</h3>
+            <div class="input-group">
+                <label for="foodDesc">Food Description</label>
+                <input type="text" class="log-input" id="foodDesc" placeholder="e.g., Chicken breast, rice, broccoli">
+            </div>
+            <div class="input-grid">
+                <div class="input-group">
+                    <label for="foodCalories">Calories</label>
+                    <input type="number" class="log-input" id="foodCalories" placeholder="500">
+                </div>
+                <div class="input-group">
+                    <label for="foodProtein">Protein (g)</label>
+                    <input type="number" class="log-input" id="foodProtein" placeholder="40">
+                </div>
+                <div class="input-group">
+                    <label for="foodCarbs">Carbs (g)</label>
+                    <input type="number" class="log-input" id="foodCarbs" placeholder="60">
+                </div>
+                <div class="input-group">
+                    <label for="foodFat">Fat (g)</label>
+                    <input type="number" class="log-input" id="foodFat" placeholder="10">
+                </div>
+            </div>
+            <button class="btn-primary" onclick="logFood()">Add Food</button>
+        </div>
+
+        <!-- Log Workout -->
+        <div class="log-section">
+            <h3>💪 Log Workout</h3>
+            <div class="input-group">
+                <label for="workoutInput">Workout (Format: Lift: weight x reps, ...)</label>
+                <textarea class="log-input" id="workoutInput" placeholder="Example: Bench Press: 225 x 5, Squat: 315 x 3, Deadlift: 405 x 1"></textarea>
+            </div>
+            <button class="btn-primary" onclick="logWorkout()">Log Workout</button>
+        </div>
+
+        <!-- Log Weight -->
+        <div class="log-section">
+            <h3>⚖️ Log Weight</h3>
+            <div class="input-group">
+                <label for="weightInput">Weight (lbs)</label>
+                <input type="number" class="log-input" id="weightInput" placeholder="200.5" step="0.1">
+            </div>
+            <button class="btn-primary" onclick="logWeight()">Update Weight</button>
+        </div>
+    </div>
+
+    <script>
+        // Chart configuration
+        Chart.defaults.color = '#64748b';
+        Chart.defaults.borderColor = '#e2e8f0';
+        
+        let weightChart, macrosChart;
+        
+        function initCharts() {
+            // Weight Chart
+            const weightCtx = document.getElementById('weightChart').getContext('2d');
+            weightChart = new Chart(weightCtx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Weight (lbs)',
+                        data: [],
+                        borderColor: '#6366f1',
+                        backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 6,
+                        pointHoverRadius: 8,
+                        pointBackgroundColor: '#6366f1'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: false, grid: { color: '#e2e8f0' } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+            
+            // Macros Chart
+            const macrosCtx = document.getElementById('macrosChart').getContext('2d');
+            macrosChart = new Chart(macrosCtx, {
+                type: 'bar',
+                data: {
+                    labels: [],
+                    datasets: [
+                        { label: 'Protein (g)', data: [], backgroundColor: '#6366f1', borderRadius: 8 },
+                        { label: 'Carbs (g)', data: [], backgroundColor: '#10b981', borderRadius: 8 },
+                        { label: 'Fat (g)', data: [], backgroundColor: '#f59e0b', borderRadius: 8 }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: true, position: 'top' } },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: '#e2e8f0' } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+        
+        async function updateDashboard() {
+            try {
+                const response = await fetch('/api/stats');
+                const data = await response.json();
+                
+                // Update stats
+                document.getElementById('calories-stat').textContent = data.today.calories || 0;
+                document.getElementById('protein-stat').textContent = (data.today.protein || 0) + 'g';
+                document.getElementById('weight-stat').textContent = data.current_weight ? data.current_weight + ' lbs' : '--';
+                
+                const calRemaining = (data.goals.calories || 2650) - (data.today.calories || 0);
+                const protRemaining = (data.goals.protein || 200) - (data.today.protein || 0);
+                document.getElementById('calories-remaining').textContent = calRemaining + ' remaining';
+                document.getElementById('protein-remaining').textContent = protRemaining + 'g remaining';
+                
+                // Update macros
+                updateMacroCard('protein', data.today.protein || 0, data.goals.protein || 200);
+                updateMacroCard('carbs', data.today.carbs || 0, data.goals.carbs || 250);
+                updateMacroCard('fat', data.today.fat || 0, data.goals.fat || 70);
+                updateMacroCard('calories', data.today.calories || 0, data.goals.calories || 2650);
+                
+                // Update charts
+                if (data.history) {
+                    updateCharts(data.history);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+        
+        function updateMacroCard(macro, current, goal) {
+            const percent = Math.min((current / goal) * 100, 100);
+            document.getElementById(`${macro}-current`).textContent = Math.round(current);
+            document.getElementById(`${macro}-goal`).textContent = goal;
+            document.getElementById(`${macro}-bar`).style.width = percent + '%';
+            
+            let status = 'On track';
+            if (percent < 50) status = 'Needs attention';
+            else if (percent > 110) status = 'Over target';
+            else if (percent >= 90) status = 'Almost there!';
+            document.getElementById(`${macro}-status`).textContent = status;
+        }
+        
+        function updateCharts(history) {
+            const labels = history.map(e => new Date(e.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+            weightChart.data.labels = labels;
+            weightChart.data.datasets[0].data = history.map(e => e.weight);
+            weightChart.update();
+            
+            macrosChart.data.labels = labels;
+            macrosChart.data.datasets[0].data = history.map(e => e.protein || 0);
+            macrosChart.data.datasets[1].data = history.map(e => e.carbs || 0);
+            macrosChart.data.datasets[2].data = history.map(e => e.fat || 0);
+            macrosChart.update();
+        }
+        
+        function logFood() {
+            const food = {
+                description: document.getElementById('foodDesc').value,
+                calories: parseInt(document.getElementById('foodCalories').value) || 0,
+                protein: parseInt(document.getElementById('foodProtein').value) || 0,
+                carbs: parseInt(document.getElementById('foodCarbs').value) || 0,
+                fat: parseInt(document.getElementById('foodFat').value) || 0
+            };
+            
+            fetch('/api/log-food', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(food)
+            }).then(() => {
+                document.getElementById('foodDesc').value = '';
+                document.getElementById('foodCalories').value = '';
+                document.getElementById('foodProtein').value = '';
+                document.getElementById('foodCarbs').value = '';
+                document.getElementById('foodFat').value = '';
+                updateDashboard();
+            });
+        }
+        
+        function logWorkout() {
+            const input = document.getElementById('workoutInput').value;
+            const lifts = [];
+            const lines = input.split(',');
+            lines.forEach(line => {
+                const parts = line.trim().split(':');
+                if (parts.length === 2) {
+                    const name = parts[0].trim();
+                    const weightReps = parts[1].trim().split('x');
+                    if (weightReps.length === 2) {
+                        lifts.push({
+                            name: name,
+                            weight: parseFloat(weightReps[0].trim()),
+                            reps: parseInt(weightReps[1].trim())
+                        });
+                    }
+                }
+            });
+            
+            if (lifts.length > 0) {
+                fetch('/api/log-workout', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({lifts: lifts})
+                }).then(() => {
+                    document.getElementById('workoutInput').value = '';
+                    updateDashboard();
+                });
+            }
+        }
+        
+        function logWeight() {
+            const weight = parseFloat(document.getElementById('weightInput').value);
+            if (weight > 0) {
+                fetch('/api/log-weight', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({weight: weight})
+                }).then(() => {
+                    document.getElementById('weightInput').value = '';
+                    updateDashboard();
+                });
+            }
+        }
+        
+        // Initialize
+        initCharts();
+        updateDashboard();
+        setInterval(updateDashboard, 30000);
+    </script>
+</body>
+</html>
