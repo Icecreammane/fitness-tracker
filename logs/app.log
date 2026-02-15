@@ -8,7 +8,14 @@
  * Restarting with stat
  * Debugger is active!
  * Debugger PIN: 274-491-875
-10.0.0.18 - - [14/Feb/2026 19:27:42] "GET / HTTP/1.1" 200 -
-10.0.0.18 - - [14/Feb/2026 19:27:45] "GET / HTTP/1.1" 200 -
-/opt/homebrew/Cellar/python@3.14/3.14.3/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/resource_tracker.py:396: UserWarning: resource_tracker: There appear to be 1 leaked semaphore objects to clean up at shutdown: {'/mp-9kfiw65t'}
-  warnings.warn(
+127.0.0.1 - - [14/Feb/2026 20:18:38] "[33mGET /api/stats HTTP/1.1[0m" 404 -
+127.0.0.1 - - [14/Feb/2026 20:18:49] "GET /api/history?days=14 HTTP/1.1" 200 -
+127.0.0.1 - - [14/Feb/2026 20:19:08] "[33mGET /api/stats HTTP/1.1[0m" 404 -
+127.0.0.1 - - [14/Feb/2026 20:19:32] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [14/Feb/2026 20:19:32] "[36mGET /static/styles/jarvis-design-system.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [14/Feb/2026 20:19:32] "[33mGET /api/stats HTTP/1.1[0m" 404 -
+127.0.0.1 - - [14/Feb/2026 20:19:38] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [14/Feb/2026 20:19:38] "[36mGET /static/styles/jarvis-design-system.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [14/Feb/2026 20:19:38] "[33mGET /api/stats HTTP/1.1[0m" 404 -
+127.0.0.1 - - [14/Feb/2026 20:20:22] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [14/Feb/2026 20:20:26] "GET /api/today HTTP/1.1" 200 -
