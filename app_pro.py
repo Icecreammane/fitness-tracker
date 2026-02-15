@@ -49,7 +49,7 @@ def health_check():
 
 @app.route('/')
 def dashboard():
-    return render_template('dashboard_pro.html')
+    return render_template('dashboard_v3.html')
 
 @app.route('/settings')
 def settings():
