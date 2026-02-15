@@ -132,11 +132,7 @@ def settings():
 @app.route('/import')
 def import_page():
     """Serve the import utility page"""
-    try:
-        with open('import.html') as f:
-            return f.read()
-    except:
-        return "Import page not found", 404
+    return render_template('import.html')
 
 @app.route('/api/today')
 def get_today():
@@ -1488,8 +1484,6 @@ def clear_all_data():
             'error': str(e)
         }), 400
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=3000, debug=True)
 
 
 @app.route('/api/import_meals', methods=['POST'])
@@ -1577,3 +1571,7 @@ def photo_log():
 
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=3000, debug=True)
+

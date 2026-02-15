@@ -1,0 +1,1096 @@
+{
+  "workouts": [
+    {
+      "date": "2026-02-02",
+      "timestamp": 1770082332.922762,
+      "lifts": [
+        {
+          "name": "Lunges",
+          "weight": 0,
+          "reps": 10,
+          "sets": 3,
+          "notes": "Bodyweight"
+        },
+        {
+          "name": "Hack Squat",
+          "weight": 90,
+          "reps": 10,
+          "sets": 1
+        },
+        {
+          "name": "Hack Squat",
+          "weight": 180,
+          "reps": 10,
+          "sets": 1
+        },
+        {
+          "name": "Hack Squat",
+          "weight": 230,
+          "reps": 8,
+          "sets": 1
+        },
+        {
+          "name": "Leg Press",
+          "weight": 360,
+          "reps": 10,
+          "sets": 1
+        },
+        {
+          "name": "Leg Press",
+          "weight": 450,
+          "reps": 10,
+          "sets": 1
+        },
+        {
+          "name": "Leg Press",
+          "weight": 540,
+          "reps": 8,
+          "sets": 1
+        },
+        {
+          "name": "Leg Press",
+          "weight": 540,
+          "reps": 6,
+          "sets": 1
+        },
+        {
+          "name": "Hip Thrust Machine",
+          "weight": 180,
+          "reps": 10,
+          "sets": 1
+        },
+        {
+          "name": "Hip Thrust Machine",
+          "weight": 230,
+          "reps": 10,
+          "sets": 1
+        },
+        {
+          "name": "Hip Thrust Machine",
+          "weight": 270,
+          "reps": 10,
+          "sets": 1
+        },
+        {
+          "name": "Leg Extension",
+          "weight": 150,
+          "reps": 10,
+          "sets": 3
+        },
+        {
+          "name": "Leg Curl",
+          "weight": 110,
+          "reps": 10,
+          "sets": 3
+        },
+        {
+          "name": "Standing Calf Raise",
+          "weight": 180,
+          "reps": 10,
+          "sets": 4
+        }
+      ],
+      "exercise": "Unknown",
+      "sets": 1,
+      "weight": 0,
+      "reps": 1
+    },
+    {
+      "date": "2026-02-04",
+      "timestamp": 1770244551.142551,
+      "lifts": [],
+      "exercise": "Unknown",
+      "sets": 1,
+      "weight": 0,
+      "reps": 1
+    },
+    {
+      "date": "2026-02-06",
+      "timestamp": 1770428042.797514,
+      "lifts": [
+        {
+          "name": "Shoulder Press Machine",
+          "weight": 90,
+          "reps": 10,
+          "sets": 1
+        },
+        {
+          "name": "Shoulder Press Machine",
+          "weight": 140,
+          "reps": 10,
+          "sets": 1
+        },
+        {
+          "name": "Shoulder Press Machine",
+          "weight": 180,
+          "reps": 8,
+          "sets": 1
+        },
+        {
+          "name": "EZ Bar Upright Rows",
+          "weight": 70,
+          "reps": 10,
+          "sets": 3
+        },
+        {
+          "name": "Dumbbell Shoulder Press",
+          "weight": 50,
+          "reps": 10,
+          "sets": 1,
+          "notes": "each hand"
+        },
+        {
+          "name": "Dumbbell Shoulder Press",
+          "weight": 55,
+          "reps": 10,
+          "sets": 1,
+          "notes": "each hand"
+        },
+        {
+          "name": "Dumbbell Shoulder Press",
+          "weight": 60,
+          "reps": 8,
+          "sets": 1,
+          "notes": "each hand"
+        },
+        {
+          "name": "Lateral Raise Machine",
+          "weight": 55,
+          "reps": 10,
+          "sets": 1
+        },
+        {
+          "name": "Lateral Raise Machine",
+          "weight": 70,
+          "reps": 8,
+          "sets": 2
+        },
+        {
+          "name": "Dumbbell Lateral Raises",
+          "weight": 17.5,
+          "reps": 10,
+          "sets": 1
+        },
+        {
+          "name": "Dumbbell Lateral Raises",
+          "weight": 20,
+          "reps": 10,
+          "sets": 1
+        },
+        {
+          "name": "Dumbbell Lateral Raises",
+          "weight": 20,
+          "reps": 8,
+          "sets": 1
+        },
+        {
+          "name": "Cable Front Raises",
+          "weight": 25,
+          "reps": 10,
+          "sets": 1
+        },
+        {
+          "name": "Cable Front Raises",
+          "weight": 30,
+          "reps": 6,
+          "sets": 1
+        },
+        {
+          "name": "Cable Front Raises",
+          "weight": 25,
+          "reps": 8,
+          "sets": 1
+        },
+        {
+          "name": "Face Pulls",
+          "weight": 50,
+          "reps": 10,
+          "sets": 3
+        },
+        {
+          "name": "Smith Machine Shrugs",
+          "weight": 140,
+          "reps": 10,
+          "sets": 1
+        },
+        {
+          "name": "Smith Machine Shrugs",
+          "weight": 155,
+          "reps": 10,
+          "sets": 1
+        },
+        {
+          "name": "Smith Machine Shrugs",
+          "weight": 170,
+          "reps": 10,
+          "sets": 1
+        },
+        {
+          "name": "Dumbbell Shrugs",
+          "weight": 60,
+          "reps": 10,
+          "sets": 3,
+          "notes": "each hand"
+        }
+      ],
+      "exercise": "Unknown",
+      "sets": 1,
+      "weight": 0,
+      "reps": 1
+    },
+    {
+      "date": "2026-02-08",
+      "timestamp": 1770581740.115447,
+      "lifts": [],
+      "exercise": "Unknown",
+      "sets": 1,
+      "weight": 0,
+      "reps": 1
+    }
+  ],
+  "food_logs": [
+    {
+      "date": "2026-02-02",
+      "timestamp": 1738498440,
+      "description": "Medium Banana",
+      "calories": 105,
+      "protein": 1,
+      "carbs": 27,
+      "fat": 0
+    },
+    {
+      "date": "2026-02-02",
+      "timestamp": 1770082082.031303,
+      "description": "Grilled Chicken + Brussels Sprouts + Mashed Potatoes (lunch)",
+      "calories": 500,
+      "protein": 42,
+      "carbs": 40,
+      "fat": 18
+    },
+    {
+      "date": "2026-02-02",
+      "timestamp": 1770084331.355589,
+      "description": "GT's Organic Kombucha (Mango)",
+      "calories": 60,
+      "protein": 0,
+      "carbs": 16,
+      "fat": 0
+    },
+    {
+      "date": "2026-02-02",
+      "timestamp": 1770084905.015733,
+      "description": "Ground Beef Hash Brown Bowl (1 lb Publix 93% beef, 8 oz cottage cheese, hash browns)",
+      "calories": 1040,
+      "protein": 118,
+      "carbs": 43,
+      "fat": 42
+    },
+    {
+      "date": "2026-02-02",
+      "timestamp": 1770084983.658408,
+      "description": "Long Live Real Meat Beef Sticks (3 sticks)",
+      "calories": 135,
+      "protein": 12,
+      "carbs": 0,
+      "fat": 9
+    },
+    {
+      "date": "2026-02-03",
+      "timestamp": 1770127389.758491,
+      "description": "Banana (1 medium)",
+      "calories": 105,
+      "protein": 1,
+      "carbs": 27,
+      "fat": 0
+    },
+    {
+      "date": "2026-02-03",
+      "timestamp": 1770144571.532997,
+      "description": "Chicken, Mashed Potatoes, Brussels Sprouts",
+      "calories": 440,
+      "protein": 38,
+      "carbs": 35,
+      "fat": 15
+    },
+    {
+      "date": "2026-02-03",
+      "timestamp": 1770165191.02329,
+      "description": "Bacon (10 strips)",
+      "calories": 233,
+      "protein": 16,
+      "carbs": 1,
+      "fat": 18
+    },
+    {
+      "date": "2026-02-03",
+      "timestamp": 1770173589,
+      "description": "Ground Beef Hash Brown Bowl (similar to yesterday)",
+      "calories": 1040,
+      "protein": 118,
+      "carbs": 43,
+      "fat": 42
+    },
+    {
+      "date": "2026-02-03",
+      "timestamp": 1770173620,
+      "description": "Dark Chocolate (1 oz)",
+      "calories": 170,
+      "protein": 2,
+      "carbs": 13,
+      "fat": 12
+    },
+    {
+      "date": "2026-02-03",
+      "timestamp": 1770173650,
+      "description": "Tuna (5 oz can in water)",
+      "calories": 150,
+      "protein": 33,
+      "carbs": 0,
+      "fat": 1
+    },
+    {
+      "date": "2026-02-04",
+      "timestamp": 1770214125.457442,
+      "description": "Banana",
+      "calories": 105,
+      "protein": 1,
+      "carbs": 27,
+      "fat": 0.4
+    },
+    {
+      "date": "2026-02-04",
+      "timestamp": 1770228538.047131,
+      "description": "Lunch - Grilled chicken, roasted Brussels sprouts, mashed potatoes",
+      "calories": 425,
+      "protein": 45,
+      "carbs": 32,
+      "fat": 11
+    },
+    {
+      "date": "2026-02-04",
+      "timestamp": 1770251214.37632,
+      "description": null,
+      "calories": 1100,
+      "protein": 45,
+      "carbs": 95,
+      "fat": 0
+    },
+    {
+      "date": "2026-02-06",
+      "timestamp": 1770392041.798159,
+      "description": null,
+      "calories": 105,
+      "protein": 1,
+      "carbs": 27,
+      "fat": 0
+    },
+    {
+      "date": "2026-02-06",
+      "timestamp": 1770395868.276069,
+      "description": null,
+      "calories": 80,
+      "protein": 5,
+      "carbs": 0,
+      "fat": 6
+    },
+    {
+      "date": "2026-02-06",
+      "timestamp": 1770395907.371099,
+      "description": null,
+      "calories": 240,
+      "protein": 15,
+      "carbs": 0,
+      "fat": 18
+    },
+    {
+      "date": "2026-02-06",
+      "timestamp": 1770408075.83961,
+      "description": null,
+      "calories": 320,
+      "protein": 20,
+      "carbs": 0,
+      "fat": 24
+    },
+    {
+      "date": "2026-02-06",
+      "timestamp": 1770410814.587113,
+      "description": null,
+      "calories": 550,
+      "protein": 45,
+      "carbs": 45,
+      "fat": 22
+    },
+    {
+      "date": "2026-02-06",
+      "timestamp": 1770426164.5396569,
+      "description": "Grass-Fed Beef Taco Sticks (4 sticks)",
+      "calories": 180,
+      "protein": 12,
+      "carbs": 4,
+      "fat": 12
+    },
+    {
+      "date": "2026-02-06",
+      "timestamp": 1770427347.923927,
+      "description": "Homemade Chili (1.5 cups)",
+      "calories": 400,
+      "protein": 30,
+      "carbs": 35,
+      "fat": 18
+    },
+    {
+      "date": "2026-02-08",
+      "timestamp": 1770581414.024512,
+      "description": "Grilled Salmon",
+      "calories": 250,
+      "protein": 35,
+      "carbs": 0,
+      "fat": 15
+    },
+    {
+      "date": "2026-02-08",
+      "timestamp": 1770581820.0,
+      "description": "2 Italian subs from deli (Super Bowl party)",
+      "calories": 1400,
+      "protein": 65,
+      "carbs": 110,
+      "fat": 70
+    },
+    {
+      "date": "2026-02-08",
+      "timestamp": 1770603240.0,
+      "description": "Super Bowl party snacks: M&M cookie, jalape\u00f1o poppers, chips+dip, pretzels",
+      "calories": 940,
+      "protein": 22,
+      "carbs": 97,
+      "fat": 50
+    },
+    {
+      "date": "2026-02-09",
+      "timestamp": 1770684000.0,
+      "description": "10 slices Black Label bacon + crispy chicken sandwich + fried onions + Santitas chips",
+      "calories": 950,
+      "protein": 48,
+      "carbs": 65,
+      "fat": 52
+    },
+    {
+      "date": "2026-02-09",
+      "timestamp": 1770702240.0,
+      "description": "4 hamburger sliders + glass of white wine",
+      "calories": 620,
+      "protein": 32,
+      "carbs": 48,
+      "fat": 26
+    },
+    {
+      "date": "2026-02-11",
+      "timestamp": 1770833280.0,
+      "description": "2 chicken wraps (tortilla) + baby carrots + hummus",
+      "calories": 480,
+      "protein": 23,
+      "carbs": 43,
+      "fat": 21
+    },
+    {
+      "date": "2026-02-11",
+      "timestamp": 1770855120.0,
+      "description": "Beef Hash Brown Cottage Cheese Bowl (6 oz ground beef, 1 cup hash browns, 3/4 cup cottage cheese)",
+      "calories": 730,
+      "protein": 60,
+      "carbs": 31,
+      "fat": 41
+    },
+    {
+      "date": "2026-02-12",
+      "timestamp": 1770953908.56575,
+      "description": "Banana",
+      "calories": 105,
+      "protein": 1,
+      "carbs": 27,
+      "fat": 0
+    },
+    {
+      "date": "2026-02-12",
+      "timestamp": 1770953912.923191,
+      "description": "2 Chicken Wraps (tortilla) + Baby Carrots",
+      "calories": 550,
+      "protein": 45,
+      "carbs": 50,
+      "fat": 12
+    },
+    {
+      "date": "2026-02-12",
+      "timestamp": 1770953916.363933,
+      "description": "Beef Potato Cottage Cheese Bowl (1 lb 93/7 beef, 3 cups hash browns, 6 oz cottage cheese)",
+      "calories": 1295,
+      "protein": 163,
+      "carbs": 54,
+      "fat": 57
+    },
+    {
+      "date": "2026-02-12",
+      "timestamp": 1770953921.359105,
+      "description": "Tortilla Chips (~1.5 oz)",
+      "calories": 200,
+      "protein": 3,
+      "carbs": 24,
+      "fat": 10
+    },
+    {
+      "date": "2026-02-12",
+      "timestamp": 1770953993.978024,
+      "description": "10 slices Black Label bacon + crispy chicken sandwich + fried onions + Santitas chips",
+      "calories": 950,
+      "protein": 48,
+      "carbs": 65,
+      "fat": 52
+    }
+  ],
+  "weight_logs": [
+    {
+      "date": "2026-02-08",
+      "timestamp": 1770581740.072806,
+      "weight": 224.5
+    }
+  ],
+  "settings": {
+    "target_weight": 210,
+    "current_weight": 225,
+    "daily_calories": 2200,
+    "daily_protein": 200,
+    "daily_carbs": 250,
+    "daily_fat": 70,
+    "birthday": "2026-05-24",
+    "daily_calorie_goal": 2200,
+    "daily_protein_goal": 200,
+    "daily_carb_goal": 250,
+    "daily_fat_goal": 70
+  },
+  "meals": [
+    {
+      "date": "2026-02-02",
+      "time": "06:14",
+      "description": "Medium Banana",
+      "calories": 105,
+      "protein": 1,
+      "carbs": 27,
+      "fat": 0
+    },
+    {
+      "date": "2026-02-02",
+      "time": "19:28",
+      "description": "Grilled Chicken + Brussels Sprouts + Mashed Potatoes (lunch)",
+      "calories": 500,
+      "protein": 42,
+      "carbs": 40,
+      "fat": 18
+    },
+    {
+      "date": "2026-02-02",
+      "time": "20:05",
+      "description": "GT's Organic Kombucha (Mango)",
+      "calories": 60,
+      "protein": 0,
+      "carbs": 16,
+      "fat": 0
+    },
+    {
+      "date": "2026-02-02",
+      "time": "20:15",
+      "description": "Ground Beef Hash Brown Bowl (1 lb Publix 93% beef, 8 oz cottage cheese, hash browns)",
+      "calories": 1040,
+      "protein": 118,
+      "carbs": 43,
+      "fat": 42
+    },
+    {
+      "date": "2026-02-02",
+      "time": "20:16",
+      "description": "Long Live Real Meat Beef Sticks (3 sticks)",
+      "calories": 135,
+      "protein": 12,
+      "carbs": 0,
+      "fat": 9
+    },
+    {
+      "date": "2026-02-03",
+      "time": "08:03",
+      "description": "Banana (1 medium)",
+      "calories": 105,
+      "protein": 1,
+      "carbs": 27,
+      "fat": 0
+    },
+    {
+      "date": "2026-02-03",
+      "time": "12:49",
+      "description": "Chicken, Mashed Potatoes, Brussels Sprouts",
+      "calories": 440,
+      "protein": 38,
+      "carbs": 35,
+      "fat": 15
+    },
+    {
+      "date": "2026-02-03",
+      "time": "18:33",
+      "description": "Bacon (10 strips)",
+      "calories": 233,
+      "protein": 16,
+      "carbs": 1,
+      "fat": 18
+    },
+    {
+      "date": "2026-02-03",
+      "time": "20:53",
+      "description": "Ground Beef Hash Brown Bowl (similar to yesterday)",
+      "calories": 1040,
+      "protein": 118,
+      "carbs": 43,
+      "fat": 42
+    },
+    {
+      "date": "2026-02-03",
+      "time": "20:53",
+      "description": "Dark Chocolate (1 oz)",
+      "calories": 170,
+      "protein": 2,
+      "carbs": 13,
+      "fat": 12
+    },
+    {
+      "date": "2026-02-03",
+      "time": "20:54",
+      "description": "Tuna (5 oz can in water)",
+      "calories": 150,
+      "protein": 33,
+      "carbs": 0,
+      "fat": 1
+    },
+    {
+      "date": "2026-02-04",
+      "time": "08:30",
+      "description": "Banana",
+      "calories": 105,
+      "protein": 1,
+      "carbs": 27,
+      "fat": 0
+    },
+    {
+      "date": "2026-02-04",
+      "time": "12:00",
+      "description": "Chicken + Brussels sprouts + mashed potatoes",
+      "calories": 425,
+      "protein": 35,
+      "carbs": 40,
+      "fat": 12
+    },
+    {
+      "date": "2026-02-04",
+      "time": "18:30",
+      "description": "Publix Boar's Head Deluxe sub (beef bologna, salami, tavern ham, cheddar)",
+      "calories": 1100,
+      "protein": 50,
+      "carbs": 90,
+      "fat": 48
+    },
+    {
+      "date": "2026-02-05",
+      "time": "12:21",
+      "description": "Chili (1.5 cups homemade with ground beef)",
+      "calories": 400,
+      "protein": 30,
+      "carbs": 25,
+      "fat": 18
+    },
+    {
+      "date": "2026-02-05",
+      "time": "12:21",
+      "description": "Cornbread muffin (2)",
+      "calories": 380,
+      "protein": 7,
+      "carbs": 56,
+      "fat": 14
+    },
+    {
+      "date": "2026-02-05",
+      "time": "17:20",
+      "description": "3 chicken wraps (flour tortilla with chicken, rice, veggies)",
+      "calories": 850,
+      "protein": 45,
+      "carbs": 95,
+      "fat": 30
+    },
+    {
+      "date": "2026-02-05",
+      "time": "19:26",
+      "description": "High Noon Pineapple vodka seltzer",
+      "calories": 100,
+      "protein": 0,
+      "carbs": 5,
+      "fat": 0
+    },
+    {
+      "date": "2026-02-06",
+      "time": "09:34",
+      "description": null,
+      "calories": 105,
+      "protein": 1,
+      "carbs": 27,
+      "fat": 0
+    },
+    {
+      "date": "2026-02-06",
+      "time": "10:37",
+      "description": null,
+      "calories": 80,
+      "protein": 5,
+      "carbs": 0,
+      "fat": 6
+    },
+    {
+      "date": "2026-02-06",
+      "time": "10:38",
+      "description": null,
+      "calories": 240,
+      "protein": 15,
+      "carbs": 0,
+      "fat": 18
+    },
+    {
+      "date": "2026-02-06",
+      "time": "14:01",
+      "description": null,
+      "calories": 320,
+      "protein": 20,
+      "carbs": 0,
+      "fat": 24
+    },
+    {
+      "date": "2026-02-06",
+      "time": "14:46",
+      "description": null,
+      "calories": 550,
+      "protein": 45,
+      "carbs": 45,
+      "fat": 22
+    },
+    {
+      "date": "2026-02-06",
+      "time": "19:02",
+      "description": "Grass-Fed Beef Taco Sticks (4 sticks)",
+      "calories": 180,
+      "protein": 12,
+      "carbs": 4,
+      "fat": 12
+    },
+    {
+      "date": "2026-02-06",
+      "time": "19:22",
+      "description": "Homemade Chili (1.5 cups)",
+      "calories": 400,
+      "protein": 30,
+      "carbs": 35,
+      "fat": 18
+    },
+    {
+      "date": "2026-02-07",
+      "time": "14:38",
+      "description": "Chipotle steak burrito (2x steak, white rice, pinto beans, fresh tomato salsa, roasted chili-corn salsa) + chips",
+      "calories": 1630,
+      "protein": 74,
+      "carbs": 205,
+      "fat": 56
+    },
+    {
+      "date": "2026-02-07",
+      "time": "19:53",
+      "description": "Talenti Gelato (whole container = 3 servings)",
+      "calories": 900,
+      "protein": 12,
+      "carbs": 108,
+      "fat": 39
+    },
+    {
+      "date": "2026-02-08",
+      "time": "14:10",
+      "description": "Grilled Salmon",
+      "calories": 250,
+      "protein": 35,
+      "carbs": 0,
+      "fat": 15
+    },
+    {
+      "date": "2026-02-08",
+      "time": "14:17",
+      "description": "2 Italian subs from deli (Super Bowl party)",
+      "calories": 1400,
+      "protein": 65,
+      "carbs": 110,
+      "fat": 70
+    },
+    {
+      "date": "2026-02-08",
+      "time": "20:14",
+      "description": "Super Bowl party snacks: M&M cookie, jalape\u00f1o poppers, chips+dip, pretzels",
+      "calories": 940,
+      "protein": 22,
+      "carbs": 97,
+      "fat": 50
+    },
+    {
+      "date": "2026-02-09",
+      "time": "18:40",
+      "description": "10 slices Black Label bacon + crispy chicken sandwich + fried onions + Santitas chips",
+      "calories": 1350,
+      "protein": 65,
+      "carbs": 85,
+      "fat": 68,
+      "notes": "Date dinner"
+    },
+    {
+      "date": "2026-02-09",
+      "time": "23:44",
+      "description": "4 hamburger sliders + glass white wine",
+      "calories": 750,
+      "protein": 32,
+      "carbs": 55,
+      "fat": 38,
+      "notes": "Late night after date"
+    },
+    {
+      "date": "2026-02-10",
+      "time": "12:21",
+      "description": "2 slices cheese pizza + side salad with ranch",
+      "calories": 650,
+      "protein": 22,
+      "carbs": 60,
+      "fat": 35
+    },
+    {
+      "date": "2026-02-10",
+      "time": "13:08",
+      "description": "Banana",
+      "calories": 105,
+      "protein": 1,
+      "carbs": 27,
+      "fat": 0
+    },
+    {
+      "date": "2026-02-10",
+      "time": "18:03",
+      "description": "Rigatoni pasta with sausage (14oz container)",
+      "calories": 920,
+      "protein": 40,
+      "carbs": 90,
+      "fat": 50
+    },
+    {
+      "date": "2026-02-10",
+      "time": "18:03",
+      "description": "2 burger sliders",
+      "calories": 500,
+      "protein": 25,
+      "carbs": 35,
+      "fat": 30
+    },
+    {
+      "date": "2026-02-10",
+      "time": "22:31",
+      "description": "Tortilla chips (~1 oz)",
+      "calories": 150,
+      "protein": 2,
+      "carbs": 19,
+      "fat": 7
+    },
+    {
+      "date": "2026-02-11",
+      "time": "08:30",
+      "description": "Banana",
+      "calories": 105,
+      "protein": 1,
+      "carbs": 27,
+      "fat": 0,
+      "notes": "Morning snack"
+    },
+    {
+      "date": "2026-02-11",
+      "time": "12:08",
+      "description": "2 chicken wraps + baby carrots",
+      "calories": 480,
+      "protein": 29,
+      "carbs": 35,
+      "fat": 18,
+      "notes": "Meal prep container, small flour tortillas"
+    },
+    {
+      "date": "2026-02-11",
+      "time": "18:12",
+      "description": "Ground beef + cottage cheese bowl",
+      "calories": 730,
+      "protein": 60,
+      "carbs": 12,
+      "fat": 45,
+      "notes": "6-8oz lean ground beef + 1 cup cottage cheese, OJ on side"
+    },
+    {
+      "date": "2026-02-11",
+      "time": "19:30",
+      "description": "Ground beef + cottage cheese bowl (2nd)",
+      "calories": 730,
+      "protein": 60,
+      "carbs": 12,
+      "fat": 45
+    },
+    {
+      "date": "2026-02-12",
+      "time": "08:28",
+      "description": "Banana",
+      "calories": 105,
+      "protein": 1,
+      "carbs": 27,
+      "fat": 0
+    },
+    {
+      "date": "2026-02-12",
+      "time": "12:08",
+      "description": "2 chicken wraps (tortilla) + baby carrots",
+      "calories": 550,
+      "protein": 45,
+      "carbs": 40,
+      "fat": 18
+    },
+    {
+      "date": "2026-02-12",
+      "time": "19:47",
+      "description": "Beef potato cottage cheese bowls (1lb beef 93/7, 3c hash browns, 6oz cottage cheese)",
+      "calories": 1295,
+      "protein": 163,
+      "carbs": 54,
+      "fat": 57
+    },
+    {
+      "date": "2026-02-12",
+      "time": "20:30",
+      "description": "Tortilla chips (~1.5 oz)",
+      "calories": 200,
+      "protein": 3,
+      "carbs": 24,
+      "fat": 10
+    },
+    {
+      "date": "2026-02-13",
+      "time": "12:21",
+      "description": "Chicken wrap/quesadilla (packaged meal)",
+      "calories": 450,
+      "protein": 30,
+      "carbs": 45,
+      "fat": 15
+    },
+    {
+      "date": "2026-02-13",
+      "time": "16:54",
+      "description": "Chipotle: 2x Steak Bowls (steak, white rice, pinto beans, guac, salsas, lettuce)",
+      "calories": 1280,
+      "protein": 74,
+      "carbs": 123,
+      "fat": 35
+    },
+    {
+      "date": "2026-02-13",
+      "time": "18:51",
+      "description": "High Noon",
+      "calories": 100,
+      "protein": 0,
+      "carbs": 2,
+      "fat": 0
+    },
+    {
+      "date": "2026-02-13",
+      "time": "19:48",
+      "description": "High Noon",
+      "calories": 100,
+      "protein": 0,
+      "carbs": 2,
+      "fat": 0
+    },
+    {
+      "date": "2026-02-13",
+      "time": "20:51",
+      "description": "Nutrl",
+      "calories": 100,
+      "protein": 0,
+      "carbs": 2,
+      "fat": 0
+    },
+    {
+      "date": "2026-02-13",
+      "time": "23:14",
+      "description": "Santitas tortilla chips (rest of bag)",
+      "calories": 420,
+      "protein": 6,
+      "carbs": 57,
+      "fat": 18
+    },
+    {
+      "description": "Chipotle - Double Chicken Burrito Bowl with rice, pinto beans, salsas, lettuce + Chips & salsa",
+      "calories": 940,
+      "protein": 62,
+      "carbs": 85,
+      "fat": 25,
+      "date": "2026-02-14",
+      "time": "13:58"
+    },
+    {
+      "description": "Ice cream pint (full)",
+      "calories": 640,
+      "protein": 10,
+      "carbs": 62,
+      "fat": 34,
+      "date": "2026-02-14",
+      "time": "16:07"
+    },
+    {
+      "description": "Test Meal",
+      "calories": 300,
+      "protein": 25,
+      "carbs": 30,
+      "fat": 10,
+      "date": "2026-02-14",
+      "time": "19:35"
+    }
+  ],
+  "user_profile": {
+    "name": "Ross",
+    "age": 30,
+    "weight": 180,
+    "height": 70,
+    "daily_calorie_goal": 2200
+  },
+  "weight_history": [
+    {
+      "date": "2026-02-14",
+      "time": "18:33",
+      "weight": 185.5,
+      "notes": "Morning weigh-in"
+    },
+    {
+      "date": "2026-02-14",
+      "time": "18:33",
+      "weight": 180.5,
+      "notes": "Test weigh-in"
+    },
+    {
+      "date": "2026-02-14",
+      "time": "18:34",
+      "weight": 185.5,
+      "notes": "Test weigh-in"
+    },
+    {
+      "date": "2026-02-14",
+      "time": "19:35",
+      "weight": 175.5,
+      "notes": "Morning weight"
+    }
+  ]
+}

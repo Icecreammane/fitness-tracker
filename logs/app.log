@@ -8,14 +8,173 @@
  * Restarting with stat
  * Debugger is active!
  * Debugger PIN: 274-491-875
-127.0.0.1 - - [14/Feb/2026 20:18:38] "[33mGET /api/stats HTTP/1.1[0m" 404 -
-127.0.0.1 - - [14/Feb/2026 20:18:49] "GET /api/history?days=14 HTTP/1.1" 200 -
-127.0.0.1 - - [14/Feb/2026 20:19:08] "[33mGET /api/stats HTTP/1.1[0m" 404 -
-127.0.0.1 - - [14/Feb/2026 20:19:32] "GET / HTTP/1.1" 200 -
-127.0.0.1 - - [14/Feb/2026 20:19:32] "[36mGET /static/styles/jarvis-design-system.css HTTP/1.1[0m" 304 -
-127.0.0.1 - - [14/Feb/2026 20:19:32] "[33mGET /api/stats HTTP/1.1[0m" 404 -
-127.0.0.1 - - [14/Feb/2026 20:19:38] "GET / HTTP/1.1" 200 -
-127.0.0.1 - - [14/Feb/2026 20:19:38] "[36mGET /static/styles/jarvis-design-system.css HTTP/1.1[0m" 304 -
-127.0.0.1 - - [14/Feb/2026 20:19:38] "[33mGET /api/stats HTTP/1.1[0m" 404 -
-127.0.0.1 - - [14/Feb/2026 20:20:22] "GET / HTTP/1.1" 200 -
-127.0.0.1 - - [14/Feb/2026 20:20:26] "GET /api/today HTTP/1.1" 200 -
+127.0.0.1 - - [14/Feb/2026 20:38:42] "GET /api/today HTTP/1.1" 200 -
+127.0.0.1 - - [14/Feb/2026 20:38:42] "GET /api/last_14_days HTTP/1.1" 200 -
+127.0.0.1 - - [14/Feb/2026 20:39:42] "GET /api/today HTTP/1.1" 200 -
+127.0.0.1 - - [14/Feb/2026 20:39:42] "GET /api/last_14_days HTTP/1.1" 200 -
+127.0.0.1 - - [14/Feb/2026 20:40:04] "GET /api/today HTTP/1.1" 200 -
+127.0.0.1 - - [14/Feb/2026 20:40:04] "GET /api/last_14_days HTTP/1.1" 200 -
+ * Detected change in '/Users/clawdbot/clawd/fitness-tracker/app_pro.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 274-491-875
+ * Detected change in '/Users/clawdbot/clawd/fitness-tracker/app_pro.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 274-491-875
+ * Detected change in '/Users/clawdbot/clawd/fitness-tracker/app_pro.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 274-491-875
+10.0.0.14 - - [14/Feb/2026 20:58:20] "GET /api/today HTTP/1.1" 200 -
+10.0.0.14 - - [14/Feb/2026 20:58:20] "GET /api/last_14_days HTTP/1.1" 200 -
+10.0.0.14 - - [14/Feb/2026 20:58:20] "[35m[1mGET /api/goal_projection HTTP/1.1[0m" 500 -
+Traceback (most recent call last):
+  File "/opt/homebrew/lib/python3.14/site-packages/flask/app.py", line 1478, in __call__
+    return self.wsgi_app(environ, start_response)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/lib/python3.14/site-packages/flask/app.py", line 1458, in wsgi_app
+    response = self.handle_exception(e)
+  File "/opt/homebrew/lib/python3.14/site-packages/flask/app.py", line 1455, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/opt/homebrew/lib/python3.14/site-packages/flask/app.py", line 869, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/opt/homebrew/lib/python3.14/site-packages/flask/app.py", line 867, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/opt/homebrew/lib/python3.14/site-packages/flask/app.py", line 852, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/clawdbot/clawd/fitness-tracker/app_pro.py", line 120, in get_goal_projection
+    days_tracked = (today - start_date).days
+                    ~~~~~~^~~~~~~~~~~~
+TypeError: can't subtract offset-naive and offset-aware datetimes
+ * Detected change in '/Users/clawdbot/clawd/fitness-tracker/app_pro.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 274-491-875
+ * Detected change in '/Users/clawdbot/clawd/fitness-tracker/voice_fix.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 274-491-875
+ * Detected change in '/Users/clawdbot/clawd/fitness-tracker/voice_fix.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 274-491-875
+ * Detected change in '/Users/clawdbot/clawd/fitness-tracker/app_pro.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 274-491-875
+10.0.0.14 - - [14/Feb/2026 21:21:09] "GET /api/today HTTP/1.1" 200 -
+10.0.0.14 - - [14/Feb/2026 21:21:09] "GET /api/last_14_days HTTP/1.1" 200 -
+10.0.0.14 - - [14/Feb/2026 21:21:09] "[35m[1mGET /api/goal_projection HTTP/1.1[0m" 500 -
+Traceback (most recent call last):
+  File "/opt/homebrew/lib/python3.14/site-packages/flask/app.py", line 1478, in __call__
+    return self.wsgi_app(environ, start_response)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/lib/python3.14/site-packages/flask/app.py", line 1458, in wsgi_app
+    response = self.handle_exception(e)
+  File "/opt/homebrew/lib/python3.14/site-packages/flask/app.py", line 1455, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/opt/homebrew/lib/python3.14/site-packages/flask/app.py", line 869, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/opt/homebrew/lib/python3.14/site-packages/flask/app.py", line 867, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/opt/homebrew/lib/python3.14/site-packages/flask/app.py", line 852, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/clawdbot/clawd/fitness-tracker/app_pro.py", line 120, in get_goal_projection
+    days_tracked = (today - start_date).days
+                    ~~~~~~^~~~~~~~~~~~
+TypeError: can't subtract offset-naive and offset-aware datetimes
+ * Detected change in '/Users/clawdbot/clawd/fitness-tracker/voice_fix.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 274-491-875
+ * Detected change in '/Users/clawdbot/clawd/fitness-tracker/app_pro.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 274-491-875
+10.0.0.14 - - [14/Feb/2026 21:58:59] "GET /api/today HTTP/1.1" 200 -
+10.0.0.14 - - [14/Feb/2026 21:58:59] "GET /api/last_14_days HTTP/1.1" 200 -
+10.0.0.14 - - [14/Feb/2026 21:58:59] "[35m[1mGET /api/goal_projection HTTP/1.1[0m" 500 -
+Traceback (most recent call last):
+  File "/opt/homebrew/lib/python3.14/site-packages/flask/app.py", line 1478, in __call__
+    return self.wsgi_app(environ, start_response)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/lib/python3.14/site-packages/flask/app.py", line 1458, in wsgi_app
+    response = self.handle_exception(e)
+  File "/opt/homebrew/lib/python3.14/site-packages/flask/app.py", line 1455, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/opt/homebrew/lib/python3.14/site-packages/flask/app.py", line 869, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/opt/homebrew/lib/python3.14/site-packages/flask/app.py", line 867, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/opt/homebrew/lib/python3.14/site-packages/flask/app.py", line 852, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/clawdbot/clawd/fitness-tracker/app_pro.py", line 120, in get_goal_projection
+    days_tracked = (today - start_date).days
+                    ~~~~~~^~~~~~~~~~~~
+TypeError: can't subtract offset-naive and offset-aware datetimes
+ * Detected change in '/Users/clawdbot/clawd/fitness-tracker/app_pro.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 274-491-875
+ * Detected change in '/Users/clawdbot/clawd/fitness-tracker/app_pro.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 274-491-875
+ * Detected change in '/Users/clawdbot/clawd/fitness-tracker/app_pro.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 274-491-875
+ * Detected change in '/Users/clawdbot/clawd/fitness-tracker/app_pro.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 274-491-875
+ * Detected change in '/Users/clawdbot/clawd/fitness-tracker/app_pro.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 274-491-875
+ * Detected change in '/Users/clawdbot/clawd/fitness-tracker/app_pro.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 274-491-875
+ * Detected change in '/Users/clawdbot/clawd/fitness-tracker/app_pro.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 274-491-875
+ * Detected change in '/Users/clawdbot/clawd/fitness-tracker/app_pro.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 274-491-875
+10.0.0.14 - - [14/Feb/2026 22:39:29] "GET /api/last_14_days HTTP/1.1" 200 -
+10.0.0.14 - - [14/Feb/2026 22:39:29] "GET /api/today HTTP/1.1" 200 -
+10.0.0.14 - - [14/Feb/2026 22:39:29] "[35m[1mGET /api/goal_projection HTTP/1.1[0m" 500 -
+Traceback (most recent call last):
+  File "/opt/homebrew/lib/python3.14/site-packages/flask/app.py", line 1478, in __call__
+    return self.wsgi_app(environ, start_response)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/lib/python3.14/site-packages/flask/app.py", line 1458, in wsgi_app
+    response = self.handle_exception(e)
+  File "/opt/homebrew/lib/python3.14/site-packages/flask/app.py", line 1455, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/opt/homebrew/lib/python3.14/site-packages/flask/app.py", line 869, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/opt/homebrew/lib/python3.14/site-packages/flask/app.py", line 867, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/opt/homebrew/lib/python3.14/site-packages/flask/app.py", line 852, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/clawdbot/clawd/fitness-tracker/app_pro.py", line 204, in get_goal_projection
+    days_tracked = (today - start_date).days
+                    ~~~~~~^~~~~~~~~~~~
+TypeError: can't subtract offset-naive and offset-aware datetimes
+ * Detected change in '/Users/clawdbot/clawd/fitness-tracker/app_pro.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 274-491-875
+ * Detected change in '/Users/clawdbot/clawd/fitness-tracker/app_pro.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 274-491-875
