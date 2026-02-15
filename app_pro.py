@@ -1414,11 +1414,50 @@ def debug_versions():
     try:
         import openai
         openai_version = openai.__version__
-    except:
+    except Exception:
         openai_version = "not installed"
-    
+
     return jsonify({
         'python': sys.version,
         'openai': openai_version,
         'openai_key_set': bool(os.getenv('OPENAI_API_KEY'))
     })
+
+
+@app.route('/api/photo_log', methods=['POST'])
+def photo_log():
+    """Process meal photo and log meal (auto-save)."""
+    try:
+        if 'photo' not in request.files:
+            return jsonify({'success': False, 'error': 'No photo provided'}), 400
+
+        photo_file = request.files['photo']
+        image_bytes = photo_file.read()
+        if not image_bytes:
+            return jsonify({'success': False, 'error': 'Empty photo file'}), 400
+
+        from voice_fix import analyze_meal_photo_direct
+        api_key = os.getenv('OPENAI_API_KEY')
+
+        result_text = analyze_meal_photo_direct(image_bytes, api_key)
+        meal_data = json.loads(result_text)
+
+        now = datetime.now(ZoneInfo('America/Chicago'))
+        new_meal = {
+            'date': now.strftime('%Y-%m-%d'),
+            'time': now.strftime('%H:%M'),
+            'description': meal_data.get('food', 'Meal (photo)'),
+            'calories': int(meal_data.get('calories', 0)),
+            'protein': int(meal_data.get('protein', 0)),
+            'carbs': int(meal_data.get('carbs', 0)),
+            'fat': int(meal_data.get('fat', 0))
+        }
+
+        data = load_data()
+        data['meals'].append(new_meal)
+        save_data(data)
+
+        return jsonify({'success': True, 'meal': meal_data})
+
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500

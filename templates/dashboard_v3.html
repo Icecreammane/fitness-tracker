@@ -547,6 +547,30 @@
             }
         }
         
+        /* ========== MEAL PHOTO FAB ========== */
+        .photo-fab {
+            position: fixed;
+            bottom: 110px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--bg-card);
+            border: 2px solid var(--border-subtle);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            cursor: pointer;
+            z-index: 1000;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .photo-fab:active {
+            transform: scale(0.9);
+        }
+
         /* ========== ADD MEAL FAB ========== */
         .add-meal-fab {
             position: fixed;
@@ -843,6 +867,13 @@
                 bottom: 25px;
                 left: 25px;
             }
+
+            .photo-fab {
+                width: 55px;
+                height: 55px;
+                bottom: 100px;
+                right: 25px;
+            }
             
             .chart-container {
                 height: 180px;
@@ -851,6 +882,7 @@
         
         /* ========== GPU ACCELERATION ========== */
         .voice-fab,
+        .photo-fab,
         .add-meal-fab,
         .meal-item,
         .photo-card,
@@ -1112,6 +1144,12 @@
         <button class="voice-fab" id="voiceFab" ontouchstart="startVoiceRecording(event)" ontouchend="stopVoiceRecording(event)" onmousedown="startVoiceRecording(event)" onmouseup="stopVoiceRecording(event)">
             🎤
         </button>
+
+        <!-- Meal Photo FAB -->
+        <button class="photo-fab" id="photoFab" onclick="openMealPhotoPicker()" title="Photo Log">
+            📸
+        </button>
+        <input type="file" id="mealPhotoInput" accept="image/*" capture="environment" style="display:none" onchange="handleMealPhotoUpload(event)">
     </div>
     
     <!-- Add Meal Modal -->
@@ -1760,6 +1798,44 @@
                 }
             };
             reader.readAsDataURL(file);
+        }
+
+        // ========== MEAL PHOTO LOGGING ==========
+        function openMealPhotoPicker() {
+            const input = document.getElementById('mealPhotoInput');
+            if (input) input.click();
+        }
+
+        async function handleMealPhotoUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            showToast('Analyzing meal photo...', 'info');
+
+            try {
+                const formData = new FormData();
+                formData.append('photo', file, file.name || 'meal.jpg');
+
+                const response = await fetch('/api/photo_log', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showToast(`Logged: ${result.meal.food || 'Meal'}`, 'success');
+                    triggerConfetti();
+                    await loadDashboardData();
+                } else {
+                    showToast(result.error || 'Photo analysis failed', 'error');
+                }
+            } catch (error) {
+                console.error('Error processing photo:', error);
+                showToast('Failed to process photo', 'error');
+            } finally {
+                event.target.value = '';
+            }
         }
         
         async function loadProgressPhotos() {
