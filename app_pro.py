@@ -1483,6 +1483,37 @@ if __name__ == '__main__':
     app.run(host='0.0.0.0', port=3000, debug=True)
 
 
+@app.route('/api/import_meals', methods=['POST'])
+def import_meals():
+    """Bulk import meals (for migration/backfill)"""
+    try:
+        meals = request.json.get('meals', [])
+        if not meals:
+            return jsonify({'success': False, 'error': 'No meals provided'}), 400
+        
+        data = load_data()
+        
+        # Add meals (avoid duplicates by checking timestamp)
+        existing_times = {(m['date'], m['time']) for m in data['meals']}
+        added = 0
+        
+        for meal in meals:
+            key = (meal.get('date'), meal.get('time'))
+            if key not in existing_times:
+                data['meals'].append(meal)
+                added += 1
+        
+        save_data(data)
+        
+        return jsonify({
+            'success': True,
+            'imported': added,
+            'skipped': len(meals) - added
+        })
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 @app.route('/api/debug/versions')
 def debug_versions():
     """Debug endpoint to check package versions"""
