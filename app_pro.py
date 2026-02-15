@@ -559,6 +559,9 @@ def voice_log():
         
         # Transcribe with Whisper
         from openai import OpenAI
+        # Unset proxy env vars that Railway might set
+        for proxy_var in ['HTTP_PROXY', 'HTTPS_PROXY', 'http_proxy', 'https_proxy']:
+            os.environ.pop(proxy_var, None)
         client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
         
         with open(temp_path, 'rb') as f:
