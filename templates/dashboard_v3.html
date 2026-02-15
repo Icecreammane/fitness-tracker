@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v2.0.1 - Delete fix + logging - 2026-02-14 22:47 -->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -1618,8 +1619,13 @@
         }
         
         async function deleteMeal(index) {
-            if (!confirm('Delete this meal?')) return;
+            console.log('deleteMeal called with index:', index);
+            if (!confirm('Delete this meal?')) {
+                console.log('User cancelled delete');
+                return;
+            }
             
+            console.log('Sending delete request for meal_id:', index);
             try {
                 const response = await fetch('/api/delete_meal', {
                     method: 'POST',
@@ -1627,16 +1633,21 @@
                     body: JSON.stringify({ meal_id: index })
                 });
                 
+                console.log('Delete response status:', response.status);
                 const result = await response.json();
+                console.log('Delete result:', result);
+                
                 if (result.success) {
-                    showToast('Meal deleted ✓', 'success');
+                    showToast('Meal deleted! ✓', 'success');
+                    console.log('Reloading dashboard data...');
                     await loadDashboardData();
                 } else {
-                    showToast('Failed to delete', 'error');
+                    showToast('Failed: ' + (result.error || 'Unknown error'), 'error');
+                    console.error('Delete failed:', result);
                 }
             } catch (error) {
                 console.error('Error deleting meal:', error);
-                showToast('Failed to delete', 'error');
+                showToast('Error: ' + error.message, 'error');
             }
         }
         
